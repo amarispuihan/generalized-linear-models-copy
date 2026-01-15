@@ -31,7 +31,9 @@ Consider the following scenario:
 
 > Researchers record the number of cricket chirps per minute and temperature during that time. They use linear regression to investigate whether the number of chirps varies with temperature.
 
-a.  **Identify the response and predictor variable:** The response variable is the number of cricket chirps per minute, as this is the outcome being measured and analyzed. The predictor variable is temperature, since the researchers are interested in whether changes in temperature are associated with changes in the number of cricket chirps.
+a.  **Identify the response and predictor variable:**
+
+    The response variable is the number of cricket chirps per minute, as this is the outcome being measured and analyzed. The predictor variable is temperature, since the researchers are interested in whether changes in temperature are associated with changes in the number of cricket chirps.
 
 b.  **Write the complete specification of the statistical model:**
 
@@ -77,8 +79,17 @@ b.  **Identify which model assumption(s) are violated. Briefly explain your choi
 
 Use the [Kentucky Derby case study](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#review-of-multiple-linear-regression) in Chapter 1 of *Beyond Multiple Linear Regression.*
 
-a.  Consider [Equation (1.3)](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#multiple-linear-regression-with-two-predictors) in Section 1.6.3. Show why we have to be sure to say "holding year constant", "after adjusting for year", or an equivalent statement, when interpreting $\beta_2$.
-b.  Briefly explain why there is no error (random variation) term $\epsilon_i$ in [Equation (1.4)](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#multiple-linear-regression-with-an-interaction-term) in Section 1.6.6?
+a.  **Consider [Equation (1.3)](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#multiple-linear-regression-with-two-predictors) in Section 1.6.3. Show why we have to be sure to say "holding year constant", "after adjusting for year", or an equivalent statement, when interpreting** $\beta_2$**.**
+
+    In the Kentucky Derby case study, the coefficient $\beta_2$ in Equation (1.3) represents the effect of track condition (fast versus non-fast) after accounting for year. This is because the model includes both year and track condition as predictors, so $\beta_2$ compares two races that occur in the same year, differing only in whether the track was fast. Algebraically, if year is held fixed, the difference in predicted winning speed between fast and non-fast conditions is exactly $\beta_2$, which is why the interpretation must explicitly state “holding year constant” or “after adjusting for year.”
+
+    This phrasing is necessary because year is associated with both track condition and winning speed in the data. More recent years tend to have more races run under fast conditions, and winning speeds have also increased over time. If year were not accounted for, differences in winning speed between fast and non-fast races would partly reflect differences in the years in which those races occurred, not just differences in track condition. Including year in the model isolates the effect of track condition, so $\beta_2$ measures the expected change in winning speed due to fast versus non-fast conditions for a fixed year.
+
+b.  **Briefly explain why there is no error (random variation) term** $\epsilon_i$ **in [Equation (1.4)](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#multiple-linear-regression-with-an-interaction-term) in Section 1.6.6?**
+
+There is no error (random variation) term $\varepsilon_i$ in Equation (1.4) because the equation represents the fitted (estimated) values $\hat{Y}_i$ from the regression model, rather than the data-generating process for the observed responses $Y_i$. Equation (1.4) gives the predicted winning speed obtained by substituting the estimated regression coefficients into the linear predictor. Once the coefficients are estimated, $\hat{Y}_i$ is a deterministic function of $\text{Yearnew}_i$, $\text{Fast}_i$, and their interaction, and therefore no random error term is included.
+
+In contrast, the error term $\varepsilon_i$ appears in the statistical model for the observed winning speeds $Y_i$ to represent unexplained variability around the regression line. This random variation is reflected in the residuals $Y_i - \hat{Y}_i$ but is not part of the equation defining the fitted values themselves.
 
 ## Exercise 4
 
