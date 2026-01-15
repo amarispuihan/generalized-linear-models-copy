@@ -67,9 +67,9 @@ Consider the following scenario:
 
 > A randomized clinical trial investigated postnatal depression and the use of an estrogen patch. Patients were randomly assigned to either use the patch or not. Depression scores were recorded on 6 different visits.
 
-a.  Identify the response and predictor variables.
+a.  **Identify the response and predictor variables:** The response variable is the depression score recorded for each patient at each visit. The predictor variables include treatment assignment (use of the estrogen patch versus no patch) and time (visit number). Because depression scores are recorded repeatedly for the same patients, each patient contributes multiple observations over time.
 
-b.  Identify which model assumption(s) are violated. Briefly explain your choice.
+b.  **Identify which model assumption(s) are violated. Briefly explain your choice:** The primary linear regression assumption that is violated is independence. The independence assumption requires that all observations are independent of one another. In this study, depression scores are measured repeatedly on the same patients across six visits, meaning that observations from the same patient are likely correlated. For example, a patient with a high depression score at one visit is likely to have a similar score at subsequent visits. As a result, the depression scores within a patient are not independent. Normality could also potentially be violated. The normality assumption requires that, for a given set of predictor values, the errors in depression scores are normally distributed. Depression scores are often bounded scales and may exhibit skewness, especially if many patients have very low or very high scores. As a result, the distribution of residuals may deviate from normality.
 
 ## Exercise 3
 
