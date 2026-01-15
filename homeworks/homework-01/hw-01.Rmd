@@ -150,6 +150,33 @@ b.  **Fit Model 2, where `logprice` (the natural log of price) is now the respon
 
 c.  Recall that $log(a) - log(b) = log(\frac{a}{b})$. Use this to derive how the `price` is expected to change when `sqft` increases by 100 based on Model 2.
 
+    From Model 2, the fitted regression equation is $$
+    \mathbb{E}[\log(\text{price}) \mid \text{sqft}] = \beta_0 + \beta_1 \,\text{sqft},
+    $$ where the estimated slope is $\hat{\beta}_1 = 0.00040$.
+
+    Consider two houses that differ in size by 100 square feet. Let $\text{sqft} = s$ for the smaller house and $\text{sqft} = s + 100$ for the larger house. The difference in expected log prices is $$
+    \mathbb{E}[\log(\text{price}_{s+100})] - \mathbb{E}[\log(\text{price}_s)]
+    = \beta_1 (s + 100) - \beta_1 s
+    = 100 \beta_1.
+    $$
+
+    Using the logarithm identity $\log(a) - \log(b) = \log(a/b)$, this difference can be written as $$
+    \log\!\left( \frac{\mathbb{E}[\text{price}_{s+100}]}{\mathbb{E}[\text{price}_s]} \right)
+    = 100 \beta_1.
+    $$
+
+    Exponentiating both sides yields $$
+    \frac{\mathbb{E}[\text{price}_{s+100}]}{\mathbb{E}[\text{price}_s]}
+    = e^{100 \beta_1}.
+    $$
+
+    Substituting $\hat{\beta}_1 = 0.00040$, $$
+    \frac{\mathbb{E}[\text{price}_{s+100}]}{\mathbb{E}[\text{price}_s]}
+    = e^{0.04} \approx 1.041.
+    $$
+
+    Based on Model 2, a 100-square-foot increase in square footage is associated with an expected increase in sale price of approximately **4.1%**.
+
 d.  Fit Model 3, where `price` and `logsqft` (the natural log of sqft) are the response and predictor variables, respectively. How does the price expected to change when sqft increases by 10%? *As a hint, this is the same as multiplying sqft by 1.10.*
 
 ::: callout-tip
