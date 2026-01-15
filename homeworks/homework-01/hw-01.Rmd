@@ -9,6 +9,19 @@ font-size: 8px
 ::: callout-important
 :::
 
+```{r}
+# load packages
+library(tidyverse)   
+library(tidymodels)  
+library(knitr)       
+library(patchwork)  
+library(dplyr)
+
+
+# set default theme for ggplot2
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
 # Instructions
 
 -   Write all narrative using full sentences. Write all interpretations and conclusions in the context of the data.
@@ -104,9 +117,36 @@ We will use the following variables:
 
 *See Section 1.8 of Beyond Multiple Linear Regression for the full list of variables.*
 
-a.  Fit a linear regression model with `price` as the response variable and `sqft` as the predictor variable (Model 1). Interpret the slope coefficient in terms of the expected change in price when `sqft` increases by 100.
+```{r}
+kingCountyHouses <- read.csv("../data/kingCountyHouses.csv")
+```
 
-b.  Fit Model 2, where `logprice` (the natural log of price) is now the response variable and `sqft` is still the predictor variable. How is the `logprice` expected to change when `sqft` increases by 100?
+a.  **Fit a linear regression model with `price` as the response variable and `sqft` as the predictor variable (Model 1). Interpret the slope coefficient in terms of the expected change in price when `sqft` increases by 100.**
+
+    ```{r}
+    price_fit <- lm(price ~ sqft, data = kingCountyHouses)
+    tidy(price_fit) |>
+      kable(digits = 3)
+    ```
+
+    In Model 1, the estimated slope coefficient for `sqft` is 280.624. This means that, on average, an increase of one additional square foot in a home’s size is associated with an increase of approximately \$280.62 in the expected sale price of the home in King County, Washington,
+
+    Equivalently, when square footage increases by 100 square feet, the expected sale price of a house increases by approximately \$28,062, holding all else constant.
+
+b.  **Fit Model 2, where `logprice` (the natural log of price) is now the response variable and `sqft` is still the predictor variable. How is the `logprice` expected to change when `sqft` increases by 100?**
+
+    ```{r}
+    kingCountyHouses <- kingCountyHouses |>
+      mutate(logprice = log(price))
+      
+    price_fit_2 <- lm(logprice ~ sqft, data = kingCountyHouses)
+    tidy(price_fit_2) |>
+      kable(digits = 5)
+    ```
+
+    In Model 2, the estimated slope coefficient for `sqft` is 0.00040. This means that, on average, an increase of one additional square foot in a home’s size is associated with an increase of 0.00040 in the expected value of the natural log of the sale price.
+
+    When square footage increases by 100 square feet, the expected value of `logprice` increases by approximately 0.04.
 
 c.  Recall that $log(a) - log(b) = log(\frac{a}{b})$. Use this to derive how the `price` is expected to change when `sqft` increases by 100 based on Model 2.
 
@@ -123,7 +163,7 @@ The goal of this analysis is to use characteristics of 593 colleges and universi
 The data set is located in `college-data.csv` in the `data` folder. We will focus on the following variables:
 
 | variable | class | description |
-|:----------------|:----------------|:--------------------------------------|
+|:-----------------|:-----------------|:-----------------------------------|
 | name | character | Name of school |
 | state_name | character | state name |
 | type | character | Public or private |
