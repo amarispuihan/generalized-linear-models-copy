@@ -1,6 +1,6 @@
 ---
 title: "STA 310: Homework 1"
-author: 
+author: Amaris
 output: 
      pdf_document
 font-size: 8px
@@ -15,9 +15,9 @@ font-size: 8px
 -   Be sure all analysis code is displayed in the rendered pdf.
 -   If you are fitting a model, display the model output in a neatly formatted table. (The `tidy` and `kable` functions can help!)
 -   If you are creating a plot, use clear and informative labels and titles.
--   Render and back up your work reguarly, such as using Github. 
+-   Render and back up your work reguarly, such as using Github.
 -   When you're done, we should be able to render the final version of the Rmd document to fully reproduce your pdf.
-- Upload your pdf to Gradescope. Upload your Rmd, pdf (and any data) to Canvas. 
+-   Upload your pdf to Gradescope. Upload your Rmd, pdf (and any data) to Canvas.
 
 # Exercises
 
@@ -31,11 +31,33 @@ Consider the following scenario:
 
 > Researchers record the number of cricket chirps per minute and temperature during that time. They use linear regression to investigate whether the number of chirps varies with temperature.
 
-a.  Identify the response and predictor variable.
+a.  **Identify the response and predictor variable:** The response variable is the number of cricket chirps per minute, as this is the outcome being measured and analyzed. The predictor variable is temperature, since the researchers are interested in whether changes in temperature are associated with changes in the number of cricket chirps.
 
-b.  Write the complete specification of the statistical model.
+b.  **Write the complete specification of the statistical model:**
 
-c.  Write the assumptions for linear regression in the context of the problem.
+    Let $Y_i$ denote the number of cricket chirps per minute observed during minute $i$, and let $X_i$ denote the temperature during that same minute.
+
+    The relationship between temperature and chirping rate is modeled using simple linear regression:
+
+    $$
+    Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i, \quad i = 1, \dots, n.
+    $$
+
+    The error terms are assumed to be independent and identically distributed with a normal distribution:
+
+    $$
+    \varepsilon_i \sim \mathcal{N}(0, \sigma^2).
+    $$
+
+c.  **Write the assumptions for linear regression in the context of the problem.**
+
+-   **Linearity:** The expected number of cricket chirps per minute is a linear function of temperature. This means that, on average, changes in temperature are associated with proportional changes in the chirping rate, and this relationship can be adequately described by a straight line.
+
+-   **Independence:** The observations are independent of one another. In this context, this implies that the number of chirps recorded during one minute does not influence the number of chirps recorded during any other minute.
+
+-   **Normality:** For a fixed temperature, the deviations of the observed number of chirps per minute from the regression line are normally distributed. That is, the error terms in the model follow a normal distribution centered at zero.
+
+-   **Equal Variance:** The variability in the number of cricket chirps per minute is constant across all temperatures. This means that the spread of chirp counts around the regression line does not systematically increase or decrease as temperature increase or decrease.
 
 ## Exercise 2
 
@@ -89,26 +111,23 @@ The goal of this analysis is to use characteristics of 593 colleges and universi
 
 The data set is located in `college-data.csv` in the `data` folder. We will focus on the following variables:
 
-| variable           | class     | description                                                                           |
-|:------------|:------------|:---------------------------------------------|
-| name               | character | Name of school                                                                        |
-| state_name         | character | state name                                                                            |
-| type               | character | Public or private                                                                     |
-| early_career_pay   | double    | Median salary for alumni with 0 - 5 years experience (in US dollars)                  |
-| stem_percent       | double    | Percent of degrees awarded in science, technology, engineering, or math subjects      |
-| out_of_state_total | double    | Total cost for in-state residents in USD (sum of room & board + out of state tuition) |
+| variable | class | description |
+|:----------------|:----------------|:--------------------------------------|
+| name | character | Name of school |
+| state_name | character | state name |
+| type | character | Public or private |
+| early_career_pay | double | Median salary for alumni with 0 - 5 years experience (in US dollars) |
+| stem_percent | double | Percent of degrees awarded in science, technology, engineering, or math subjects |
+| out_of_state_total | double | Total cost for in-state residents in USD (sum of room & board + out of state tuition) |
 
 a.  Visualize the distribution of the response variable `early_career_pay`. Write 1 - 2 observations from the plot.
 b.  Visualize the relationship between (i) `early_career_pay` and `type` and (ii) `early_career_pay` and `stem_percent`. Write an observation from each plot.
 c.  Below is the specification of the statistical model for this analysis. Fit the model and neatly display the results using 3 digits. Display the 95% confidence interval for the coefficients.
 
-
 \begin{align}
 early\_career\_pay_{i} = \beta_0 &+ \beta_1~out\_of\_state\_total_{i} + \beta_2 ~ type \\
 &+ \beta_3 ~ stem\_percent_{i} + \beta_4 ~ type * stem\_percent_{i} \\ &+ \epsilon_{i}, \hspace{5mm} \text{where } \epsilon_i \sim N(0, \sigma^2)
 \end{align}
-
-
 
 d.  How many degrees of freedom are there in the estimate of the regression standard error $\sigma$?
 e.  What is the 95% confidence interval for the amount in which the intercept for public institutions differs from private institutions?
@@ -116,7 +135,6 @@ e.  What is the 95% confidence interval for the amount in which the intercept fo
 ## Exercise 6
 
 Use the analysis from the previous exercise to write a paragraph (\~ 4 - 5 sentences) describing the differences in early career pay based on the institution characteristics. *The summary should be consistent with the results from the previous exercise, comprehensive, answers the primary analysis question, and tells a cohesive story (e.g., a list of interpretations will not receive full credit).*
-
 
 # Grading
 
