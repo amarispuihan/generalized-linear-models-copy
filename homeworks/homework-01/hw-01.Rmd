@@ -132,7 +132,7 @@ a.  **Fit a linear regression model with `price` as the response variable and `s
       kable(digits = 3)
     ```
 
-    In Model 1, the estimated slope coefficient for `sqft` is 280.624. This means that, on average, an increase of one additional square foot in a home’s size is associated with an increase of approximately \$280.62 in the expected sale price of the home in King County, Washington,
+    In Model 1, the estimated slope coefficient for `sqft` is 280.624. This means that, on average, an increase of one additional square foot in a home’s size is associated with an increase of approximately \$280.62 in the expected sale price of the home in King County, Washington.
 
     Equivalently, when square footage increases by 100 square feet, the expected sale price of a house increases by approximately \$28,062, holding all else constant.
 
@@ -220,7 +220,7 @@ The goal of this analysis is to use characteristics of 593 colleges and universi
 The data set is located in `college-data.csv` in the `data` folder. We will focus on the following variables:
 
 | variable | class | description |
-|:---|:---|:---|
+|:------------------|:------------------|:---------------------------------|
 | name | character | Name of school |
 | state_name | character | state name |
 | type | character | Public or private |
@@ -239,16 +239,16 @@ ggplot(data = college_data, aes(x=early_career_pay)) +
     x = "Median Salary (USD)",
     title = "Distribution of Median Salary for Early Career College Alumni"
   )
-  
 ```
 
-```         
-Observations: The distribution of early career pay is unimodal and right-skewed, with most colleges having median early career salaries between approximately \$40,000 and \$55,000. There is a long right tail, indicating that a smaller number of colleges have substantially higher early career pay, with some values extending above \$80,000.
-```
+       
+  Observations: The distribution of early career pay is unimodal and right-skewed, with most colleges having median early career salaries between approximately \$40,000 and \$55,000. There is a long right tail, indicating that a smaller number of colleges have substantially higher early career pay, with some values extending above \$80,000.
+
 
 b.  **Visualize the relationship between (i) `early_career_pay` and `type` and (ii) `early_career_pay` and `stem_percent`. Write an observation from each plot.\*\***
 
 ```{r}
+
 ggplot(data = college_data, aes(x = type, y = early_career_pay)) +
   geom_boxplot() +
   labs(
