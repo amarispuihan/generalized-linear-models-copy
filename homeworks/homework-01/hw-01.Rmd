@@ -9,7 +9,7 @@ font-size: 8px
 ::: callout-important
 :::
 
-```{r}
+```{r, message = FALSE}
 # load packages
 library(tidyverse)   
 library(tidymodels)  
@@ -58,7 +58,7 @@ b.  **Write the complete specification of the statistical model:**
     Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i, \quad i = 1, \dots, n.
     $$
 
-    The error terms are assumed to be independent and identically distributed with a normal distribution:
+    The error terms are assumed to be independent and identically distributed with a normal distribution around the regression line:
 
     $$
     \varepsilon_i \sim \mathcal{N}(0, \sigma^2).
@@ -103,9 +103,9 @@ a.  **Consider [Equation (1.3)](https://bookdown.org/roback/bookdown-BeyondMLR/c
 
 b.  **Briefly explain why there is no error (random variation) term** $\epsilon_i$ **in [Equation (1.4)](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html#multiple-linear-regression-with-an-interaction-term) in Section 1.6.6?**
 
-There is no error (random variation) term $\varepsilon_i$ in Equation (1.4) because the equation represents the fitted (estimated) values $\hat{Y}_i$ from the regression model, rather than the data-generating process for the observed responses $Y_i$. Equation (1.4) gives the predicted winning speed obtained by substituting the estimated regression coefficients into the linear predictor. Once the coefficients are estimated, $\hat{Y}_i$ is a deterministic function of $\text{Yearnew}_i$, $\text{Fast}_i$, and their interaction, and therefore no random error term is included.
+    There is no error (random variation) term $\varepsilon_i$ in Equation (1.4) because the equation represents the fitted (estimated) values $\hat{Y}_i$ from the regression model, rather than the data-generating process for the observed responses $Y_i$. Equation (1.4) gives the predicted winning speed obtained by substituting the estimated regression coefficients into the linear predictor. Once the coefficients are estimated, $\hat{Y}_i$ is a deterministic function of $\text{Yearnew}_i$, $\text{Fast}_i$, and their interaction, and therefore no random error term is included.
 
-In contrast, the error term $\varepsilon_i$ appears in the statistical model for the observed winning speeds $Y_i$ to represent unexplained variability around the regression line. This random variation is reflected in the residuals $Y_i - \hat{Y}_i$ but is not part of the equation defining the fitted values themselves.
+    In contrast, the error term $\varepsilon_i$ appears in the statistical model for the observed winning speeds $Y_i$ to represent unexplained variability around the regression line. This random variation is reflected in the residuals $Y_i - \hat{Y}_i$ but is not part of the equation defining the fitted values themselves.
 
 ## Exercise 4
 
@@ -151,7 +151,7 @@ b.  **Fit Model 2, where `logprice` (the natural log of price) is now the respon
 
     When square footage increases by 100 square feet, the expected value of `logprice` increases by approximately 0.04.
 
-c.  Recall that $log(a) - log(b) = log(\frac{a}{b})$. Use this to derive how the `price` is expected to change when `sqft` increases by 100 based on Model 2.
+c.  **Recall that** $log(a) - log(b) = log(\frac{a}{b})$**. Use this to derive how the `price` is expected to change when `sqft` increases by 100 based on Model 2.**
 
     From Model 2, the fitted regression equation is $$
     \mathbb{E}[\log(\text{price}) \mid \text{sqft}] = \beta_0 + \beta_1 \,\text{sqft},
@@ -180,7 +180,7 @@ c.  Recall that $log(a) - log(b) = log(\frac{a}{b})$. Use this to derive how the
 
     Based on Model 2, a 100-square-foot increase in square footage is associated with an expected increase in sale price of approximately **4.1%**. (Because the response was log-transformed, this interpretation is in terms of the median price on the original scale.)
 
-d.  Fit Model 3, where `price` and `logsqft` (the natural log of sqft) are the response and predictor variables, respectively. How does the price expected to change when sqft increases by 10%? *As a hint, this is the same as multiplying sqft by 1.10.*
+d.  **Fit Model 3, where `price` and `logsqft` (the natural log of sqft) are the response and predictor variables, respectively. How does the price expected to change when sqft increases by 10%? *As a hint, this is the same as multiplying sqft by 1.10.***
 
 ::: callout-tip
 [Click here](https://github.com/STA210-Sp19/supplemental-notes/blob/master/log-transformations.pdf) for notes on interpreting model effects for log-transformed response and/or predictor variables.
@@ -211,7 +211,7 @@ Substituting $\hat{\beta}_1 = 528{,}647.5$ and $\log(1.10) \approx 0.0953$, $$
 528{,}647.5 \times 0.0953 \approx 50{,}350.
 $$
 
-Therefore, based on Model 3, a 10% increase in square footage is associated with an increase of approximately $\$50{,}000$ in the **conditional mean** sale price of a house.
+Therefore, based on Model 3, a 10% increase in square footage is associated with an increase of approximately $\$50{,}000$ in the conditional mean sale price of a house.
 
 ## Exercise 5
 
@@ -220,7 +220,7 @@ The goal of this analysis is to use characteristics of 593 colleges and universi
 The data set is located in `college-data.csv` in the `data` folder. We will focus on the following variables:
 
 | variable | class | description |
-|:------------------|:------------------|:---------------------------------|
+|:---|:---|:---|
 | name | character | Name of school |
 | state_name | character | state name |
 | type | character | Public or private |
@@ -242,9 +242,11 @@ ggplot(data = college_data, aes(x=early_career_pay)) +
   
 ```
 
+```         
 Observations: The distribution of early career pay is unimodal and right-skewed, with most colleges having median early career salaries between approximately \$40,000 and \$55,000. There is a long right tail, indicating that a smaller number of colleges have substantially higher early career pay, with some values extending above \$80,000.
+```
 
-**b.Visualize the relationship between (i) `early_career_pay` and `type` and (ii) `early_career_pay` and `stem_percent`. Write an observation from each plot. c. Below is the specification of the statistical model for this analysis. Fit the model and neatly display the results using 3 digits. Display the 95% confidence interval for the coefficients.**
+b.  **Visualize the relationship between (i) `early_career_pay` and `type` and (ii) `early_career_pay` and `stem_percent`. Write an observation from each plot.\*\***
 
 ```{r}
 ggplot(data = college_data, aes(x = type, y = early_career_pay)) +
@@ -267,7 +269,9 @@ ggplot(data = college_data, aes(x = stem_percent, y = early_career_pay)) +
 
 From the boxplot, private institutions have a slightly higher median early-career pay than public institutions. The distribution for private schools also shows greater variability and more high-end outliers, indicating that while typical early-career pay is similar across institution types, private institutions are more likely to have programs associated with very high early-career salaries.
 
-The scatterplot shows a positive linear relationship between the percentage of STEM degrees and median early-career pay. As stem_percent increases, the median early-career pay tends to increase, suggesting that institutions with a higher share of STEM programs generally have graduates who earn more early in their careers.
+The scatterplot shows a positive linear relationship between the percentage of STEM degrees and median early-career pay. As `stem_percent` increases, the median early-career pay tends to increase, suggesting that institutions with a higher share of STEM programs generally have graduates who earn more early in their careers.
+
+c.  **Below is the specification of the statistical model for this analysis. Fit the model and neatly display the results using 3 digits. Display the 95% confidence interval for the coefficients.**
 
 \begin{align}
 early\_career\_pay_{i} = \beta_0 &+ \beta_1~out\_of\_state\_total_{i} + \beta_2 ~ type \\
@@ -296,7 +300,7 @@ e.  **What is the 95% confidence interval for the amount in which the intercept 
 
 ## Exercise 6
 
-Use the analysis from the previous exercise to write a paragraph (\~ 4 - 5 sentences) describing the differences in early career pay based on the institution characteristics. *The summary should be consistent with the results from the previous exercise, comprehensive, answers the primary analysis question, and tells a cohesive story (e.g., a list of interpretations will not receive full credit).*
+**Use the analysis from the previous exercise to write a paragraph (\~ 4 - 5 sentences) describing the differences in early career pay based on the institution characteristics. *The summary should be consistent with the results from the previous exercise, comprehensive, answers the primary analysis question, and tells a cohesive story (e.g., a list of interpretations will not receive full credit).***
 
 > Early career pay varies systematically with several institutional characteristics. From the distribution of early career pay, salaries are right-skewed, with most institutions clustered around the mid-\$40,000 to \$55,000 range and a smaller number of schools offering substantially higher median pay. Comparing institution types, private institutions tend to have slightly higher median early career pay than public institutions, although the regression results indicate that this difference is not statistically significant at the 95% confidence level once other variables are accounted for. In contrast, the percentage of STEM degrees awarded is strongly associated with higher early career pay: both the scatterplot and the fitted regression line show a clear positive relationship, and the model estimates indicate that institutions with higher STEM representation have substantially higher median early career salaries. Finally, higher out-of-state costs are also positively associated with early career pay, suggesting that more expensive institutions tend to be associated with higher post-graduation earnings, even after controlling for institution type and STEM emphasis.
 
