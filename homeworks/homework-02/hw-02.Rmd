@@ -1,6 +1,6 @@
 ---
-title: 'Exploring Distributions'
-author: "STA 310: Homework 2"
+title: 'STA 310: Homework 2 - Exploring Distributions'
+author: "Amaris"
 output: pdf_document
 ---
 
@@ -273,12 +273,110 @@ The gamma distribution generalizes the exponential distribution, which models th
 
 Note that all of the observations $y_i$ will be integer values from $0, 1, \ldots, n$. With this in mind, use `rbinom()` to simulate 1,000 observations from a plain old vanilla binomial random variable with $n=10$ and $p=0.8$. Plot a histogram of these binomial observations. Then, do the following to generate a beta-binomial distribution:
 
-a.  Draw $p_i$ from the beta distribution with $\alpha=4$ and $\beta=1$.
-b.  Generate an observation $y_i$ from a binomial distribution with $n=10$ and $p = p_i$.
-c.  Repeat (a) and (b) 1,000 times ($i=1,\ldots,1000$).
-d.  Plot a histogram of these beta-binomial observations.
+```{r}
+#Stimulate Observations
+set.seed(1)
+
+n_sims <- 1000
+n <- 10
+p <- 0.8
+
+y_binom <- rbinom(n_sims, size = n, prob = p)
+
+#Plotting Histogram
+brks <- seq(-0.5, n + 0.5, by = 1)
+
+hist(y_binom,
+     breaks = brks,
+     main = "Binomial(n = 10, p = 0.8)",
+     xlab = "Number of successes",
+     col = "grey80")
+```
+
+a.  **Draw** $p_i$ **from the beta distribution with** $\alpha=4$ **and** $\beta=1$**.**
+
+    ```{r}
+    alpha <- 4
+    beta <- 1
+
+    p_i <- rbeta(1, shape1 = alpha, shape2 = beta)
+    p_i
+    ```
+
+b.  **Generate an observation** $y_i$ **from a binomial distribution with** $n=10$ **and** $p = p_i$**.**
+
+    ```{r}
+    n <- 10
+
+    y_i <- rbinom(1, size = n, prob = p_i)
+    y_i
+    ```
+
+c.  **Repeat (a) and (b) 1,000 times (**$i=1,\ldots,1000$**).**
+
+    ```{r}
+    set.seed(1)
+
+    n_sims <- 1000
+
+    p_vec <- rbeta(n_sims, shape1 = alpha, shape2 = beta)
+    y_beta_binom <- rbinom(n_sims, size = n, prob = p_vec)
+
+    head(p_vec)
+    head(y_beta_binom)
+    ```
+
+d.  **Plot a histogram of these beta-binomial observations.**
+
+    ```{r}
+    brks <- seq(-0.5, n + 0.5, by = 1)
+
+    hist(y_beta_binom,
+         breaks = brks,
+         main = "Beta-binomial (n = 10, Beta(4,1) mixing)",
+         xlab = "Number of successes",
+         col = "grey80")
+    ```
 
 Compare the histograms of the "plain old" binomial and beta-binomial distributions. How do their shapes, standard deviations, means, possible values, etc. compare?
+
+```{r}
+# Common breaks so bars align at integers 0..10
+brks <- seq(-0.5, n + 0.5, by = 1)
+
+# Binomial histogram (density scale)
+hist(y_binom,
+     breaks = brks,
+     freq = FALSE,
+     col = rgb(0, 0, 1, 0.35),
+     xlab = "Number of successes",
+     main = "Binomial vs Beta-binomial")
+
+# Overlay beta-binomial histogram
+hist(y_beta_binom,
+     breaks = brks,
+     freq = FALSE,
+     add = TRUE,
+     col = rgb(1, 0, 0, 0.35))
+
+legend("topleft",
+       legend = c("Binomial(n = 10, p = 0.8)",
+                  "Beta-binomial (p ~ Beta(4,1))"),
+       fill = c(rgb(0, 0, 1, 0.35),
+                rgb(1, 0, 0, 1, 0.35)),
+       border = NA)
+
+```
+
+```{r}
+mean(y_binom)
+sd(y_binom)
+
+mean(y_beta_binom)
+sd(y_beta_binom)
+```
+
+*Both the plain binomial and beta-binomial distributions take the same possible values, namely the integers from 0 to 10, since both represent counts of successes out of 10 trials. Their means are very similar, with the binomial distribution having a mean of about 7.99 and the beta-binomial distribution having a mean of about 8.04, indicating that both are centered around an average success probability of 0.8. Both distributions are left-skewed because p (or the mean of p) is closer to 1. However, the beta-binomial distribution has a substantially larger standard deviation (approximately 2.01) than the binomial distribution (approximately 1.28), reflecting greater variability. In the beta-binomial histogram, there is noticeably more mass at extreme values, especially near 0–3 and near 10, compared to the plain binomial.*
 
 # Grading
 
