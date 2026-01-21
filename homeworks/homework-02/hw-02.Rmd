@@ -221,15 +221,41 @@ $$which ensures that $\lambda$ remains positive and allows traffic volume to sys
 
 ## Exercise 7
 
-Chapter 1 also asked you to consider a scenario where *"Researchers are attempting to see if socioeconomic status and parental stability are predictive of low birthweight. They classify a low birthweight as below 2500 g, hence our response is binary: 1 for low birthweight, and 0 when the birthweight is not low."* What distribution might be useful to model if a newborn has low birthweight?
+**Chapter 1 also asked you to consider a scenario where *"Researchers are attempting to see if socioeconomic status and parental stability are predictive of low birthweight. They classify a low birthweight as below 2500 g, hence our response is binary: 1 for low birthweight, and 0 when the birthweight is not low."* What distribution might be useful to model if a newborn has low birthweight?**
+
+A Bernoulli distribution is appropriate for modeling whether a newborn has low birthweight.
+
+In this setting, the response variable is binary: a newborn is classified as having low birthweight (coded as $1$) if their birthweight is below 2500 g, and not low birthweight (coded as $0$) otherwise.There are only two possible outcomes for each newborn.
+
+Let $Y$ denote the indicator variable for low birthweight. Then $$
+Y \sim \mathrm{Bernoulli}(p),
+$$where $$
+p = P(Y = 1)
+$$is the probability that a newborn has low birthweight.
+
+Socioeconomic status and parental stability can be incorporated by modeling the probability $p$ as a function of these predictors, allowing researchers to assess how these factors influence the likelihood of low birthweight.
+
+(If data were collected on multiple newborns, the total number of low-birthweight cases in the sample would follow a binomial distribution. However, for an individual newborn, the Bernoulli distribution is the appropriate model).
 
 ## Exercise 8
 
-Chapter 1 also asked you to consider a scenario where *"Researchers are interested in how elephant age affects mating patterns among males. In particular, do older elephants have greater mating success, and is there an optimal age for mating among males? Data collected includes, for each elephant, age and number of matings in a given year."* Which distribution would be useful to model the number of matings in a given year for these elephants? Why?
+**Chapter 1 also asked you to consider a scenario where *"Researchers are interested in how elephant age affects mating patterns among males. In particular, do older elephants have greater mating success, and is there an optimal age for mating among males? Data collected includes, for each elephant, age and number of matings in a given year."* Which distribution would be useful to model the number of matings in a given year for these elephants? Why?**
+
+A Poisson distribution would be useful for modeling the number of matings in a given year for each elephant.
+
+In this scenario, the response variable is a count: the number of mating events observed for an individual elephant within a fixed time period (one year). The Poisson distribution is commonly used to model the number of events occurring in a fixed interval of time when events occur independently and at some average rate.
+
+Let $Y_i$ denote the number of matings for the $i$-th elephant in a given year. Then $$
+Y_i \sim \mathrm{Poisson}(\lambda_i),
+$$ where $\lambda_i > 0$ represents the expected number of matings per year for that elephant.
+
+Elephant age can be incorporated by allowing the rate parameter $\lambda_i$ to depend on age. For example, one might model $$
+\log(\lambda_i) = \beta_0 + \beta_1 \text{Age}_i + \beta_2 \text{Age}_i^2,
+$$which allows the expected number of matings to increase with age up to a point and then decrease, capturing the possibility of an optimal mating age.
 
 ## Exercise 9
 
-Describe a scenario which could be modeled using a gamma distribution.
+**Describe a scenario which could be modeled using a gamma distribution.**
 
 ## Exercise 10
 
