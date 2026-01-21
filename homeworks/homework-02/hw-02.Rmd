@@ -119,19 +119,105 @@ $$
 
 ## Exercise 3
 
-How are exponential and Poisson random variables related?
+**How are exponential and Poisson random variables related?**
+
+Poisson and exponential random variables arise from the same stochastic process (the Poisson process). A Poisson process models the occurrence of events over time under the assumptions that events occur independently and at a constant average rate.
+
+Let events occur according to a Poisson process with rate $\lambda > 0$. The number of events occurring in a time interval of length $t$ is a Poisson random variable: $$
+N(t) \sim \mathrm{Poisson}(\lambda t),
+$$ with probability mass function $$
+P(N(t) = k) = \frac{(\lambda t)^k e^{-\lambda t}}{k!}, \quad k = 0,1,2,\dots
+$$
+
+The waiting time until the first event occurs is an exponential random variable. Let $T$ denote the time to the first event. Then $$
+T \sim \mathrm{Exponential}(\lambda),
+$$ with probability density function $$
+f_T(t) = \lambda e^{-\lambda t}, \quad t \ge 0.
+$$
+
+The connection between the two distributions can be seen through the event $$
+\{T > t\} = \{N(t) = 0\}.
+$$That is, the waiting time to the first event exceeds $t$ if and only if no events occur in the interval $[0,t]$. Therefore, $$
+P(T > t) = P(N(t) = 0) = e^{-\lambda t},
+$$which is exactly the survival function of an exponential random variable with rate $\lambda$.
+
+More generally, the waiting time until the $r$-th event occurs follows a Gamma distribution: $$
+T_r \sim \mathrm{Gamma}(r, \lambda),
+$$which is the sum of $r$ independent exponential random variables, each with rate $\lambda$.
+
+In a Poisson process, the Poisson distribution describes the number of events occurring in a fixed time interval, while the exponential distribution describes the waiting time between consecutive events.
 
 ## Exercise 4
 
-How are geometric and exponential random variables similar? How are they different?
+**How are geometric and exponential random variables similar? How are they different?**
+
+Geometric and exponential random variables both model waiting times until the first success or event occurs. The geometric distribution measures the number of discrete trials required to obtain the first success, while the exponential distribution measures the amount of continuous time until the first event occurs.
+
+Both distributions are memory-less. For a geometric random variable $X \sim \mathrm{Geometric}(p)$, $$
+P(X > m+n \mid X > m) = P(X > n).
+$$ Similarly, for an exponential random variable $T \sim \mathrm{Exponential}(\lambda)$, $$
+P(T > s+t \mid T > s) = P(T > t).
+$$The memoryless property implies that the probability of waiting an additional amount of time does not depend on how long one has already waited.
+
+Both distributions are also associated with renewal processes. The geometric distribution arises from repeated Bernoulli trials with constant success probability $p$, while the exponential distribution arises from a Poisson process with constant rate $\lambda$.
+
+The main difference between the two distributions lies in the nature of their supports. A geometric random variable is discrete and takes values in the set $$
+\{1,2,3,\dots\},
+$$representing the trial on which the first success occurs. An exponential random variable is continuous and takes values in $$
+[0,\infty),
+$$representing the continuous waiting time until the first event.Their probability models also differ. The probability mass function of a geometric random variable is $$
+P(X = k) = (1-p)^{k-1}p, \quad k = 1,2,\dots
+$$ whereas the probability density function of an exponential random variable is $$
+f_T(t) = \lambda e^{-\lambda t}, \quad t \ge 0.
+$$
+
+The parameters have different interpretations. In the geometric distribution, $p$ represents the probability of success on each trial, while in the exponential distribution, $\lambda$ represents the rate at which events occur per unit time.
+
+Finally, the geometric distribution can be viewed as a discrete analogue of the exponential distribution. As the trial spacing becomes small and the success probability per trial becomes small, the geometric distribution converges to the exponential distribution.
 
 ## Exercise 5
 
-A university's college of sciences is electing a new board of 5 members. There are 35 applicants, 10 of which come from the math department. What distribution could be helpful to model the probability of electing $X$ board members from the math department?
+**A university's college of sciences is electing a new board of 5 members. There are 35 applicants, 10 of which come from the math department. What distribution could be helpful to model the probability of electing** $X$ **board members from the math department?**
+
+The hypergeometric distribution is appropriate for modeling this situation.
+
+A total of $5$ board members are selected from a finite population of $35$ applicants, $10$ of whom are from the math department. Because applicants are selected without replacement, the number of board members chosen from the math department is a hypergeometric random variable.
+
+Let $X$ denote the number of elected board members from the math department. Define $$
+N = 35 \quad \text{(total applicants)}, \qquad
+K = 10 \quad \text{(math department applicants)}, \qquad
+n = 5 \quad \text{(board members selected)}.
+$$
+
+Then $$
+X \sim \mathrm{Hypergeometric}(N=35, K=10, n=5).
+$$
+
+The probability mass function of $X$ is $$
+P(X = k)
+= \frac{\binom{10}{k}\binom{25}{5-k}}{\binom{35}{5}},
+\quad k = 0,1,2,3,4,5.
+$$
 
 ## Exercise 6
 
-Chapter 1 asked you to consider a scenario where *"The Minnesota Pollution Control Agency is interested in using traffic volume data to generate predictions of particulate distributions as measured in counts per cubic feet."* What distribution might be useful to model this count per cubic foot? Why?
+**Chapter 1 asked you to consider a scenario where *"The Minnesota Pollution Control Agency is interested in using traffic volume data to generate predictions of particulate distributions as measured in counts per cubic feet."* What distribution might be useful to model this count per cubic foot? Why?**
+
+A Poisson distribution would be useful for modeling the particulate count per cubic foot.
+
+This is because the data consist of counts of particles occurring in a fixed volume of space (one cubic foot). The Poisson distribution is commonly used to model the number of events occurring in a fixed region of time or space when the events occur independently and at a constant average rate.
+
+Let $X$ denote the number of particulate matter particles observed in one cubic foot of air. Then $$
+X \sim \mathrm{Poisson}(\lambda),
+$$ where $\lambda > 0$ represents the average number of particles per cubic foot.
+
+The Poisson distribution is appropriate in this context because particulate particles can be viewed as randomly occurring events in space, individual particles do not influence the occurrence of others, and the expected rate of occurrence can be reasonably assumed to be constant over small spatial regions.
+
+Rather than assuming a single constant rate, the rate parameter can be modeled as a function of traffic volume. For example, if $V$ denotes traffic volume, one could write $$
+\lambda = f(V),
+$$where $f(\cdot)$ is an increasing function. This could be modeled using a log-linear relationship such as $$
+\log(\lambda) = \beta_0 + \beta_1 V,
+$$which ensures that $\lambda$ remains positive and allows traffic volume to systematically influence particulate counts.
 
 ## Exercise 7
 
