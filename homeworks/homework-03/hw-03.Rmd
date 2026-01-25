@@ -1,6 +1,6 @@
 ---
 title: 'Review of Likelihoods'
-author: "STA 310: Homework 3"
+author: "STA 310: Homework 3 Amaris"
 output: pdf_document
 ---
 
@@ -16,56 +16,227 @@ library(kableExtra)
 -   Be sure all analysis code is displayed in the rendered pdf.
 -   If you are fitting a model, display the model output in a neatly formatted table. (The `tidy` and `kable` functions can help!)
 -   If you are creating a plot, use clear and informative labels and titles.
--   Render and back up your work reguarly, such as using Github. 
+-   Render and back up your work reguarly, such as using Github.
 -   When you're done, we should be able to render the final version of the Rmd document to fully reproduce your pdf.
-- Upload your pdf to Gradescope. Upload your Rmd, pdf (and any data) to Canvas. 
+-   Upload your pdf to Gradescope. Upload your Rmd, pdf (and any data) to Canvas.
 
 # Exercises
 
 ## Exercise 1
 
-Write out the likelihood for the Poisson distribution for $x_{1:n}.$
+**Write out the likelihood for the Poisson distribution for** $x_{1:n}.$
 
-The probability mass function (PMF) of a Poisson-distributed random variable \( X \) with parameter \( \lambda \) is given by:
+**The probability mass function (PMF) of a Poisson-distributed random variable** $X$ **with parameter** $\lambda$ **is given by:**
 
-\[
+$$
 P(X = x) = \frac{\lambda^x e^{-\lambda}}{x!}, \quad x = 0, 1, 2, \dots
-\]
+$$
 
-where \( \lambda > 0 \) is the rate parameter, which represents both the mean and variance of the distribution.
+**where** $\lambda > 0$ **is the rate parameter, which represents both the mean and variance of the distribution.**
+
+Let $X_1, \dots, X_n$ be independent and identically distributed Poisson random variables with parameter $\lambda > 0$. The likelihood function based on observations $x_{1:n}$ is
+
+$$
+L(\lambda \mid x_{1:n})
+= \prod_{i=1}^n P(X_i = x_i)
+= \prod_{i=1}^n \frac{\lambda^{x_i} e^{-\lambda}}{x_i!}.
+$$
+
+This can be simplified to
+
+$$
+L(\lambda \mid x_{1:n})
+= \frac{\lambda^{\sum_{i=1}^n x_i} e^{-n\lambda}}{\prod_{i=1}^n x_i!}.
+$$
 
 ## Exercise 2
 
-Derive using calculus based methods the MLE of $\lambda$ is $\sum_i x_i/n$ (sample mean) and show that it is in fact a maximum. 
+**Derive using calculus based methods the MLE of** $\lambda$ **is** $\sum_i x_i/n$ **(sample mean) and show that it is in fact a maximum.\
+**
 
-## Exercise 3 
+Let $X_1,\dots,X_n \overset{iid}{\sim}\text{Poisson}(\lambda)$ with $\lambda>0$, and suppose we observe $x_{1:n}=(x_1,\dots,x_n)$.
 
-Verify using a grid-search that your solution matches to the calculus based one, where you may assume for simplicity that $\sum_i x_i = 500.$ You may assume 100 observations. (Hint: show that the approximated MLE is 5.)
+$$
+L(\lambda\mid x_{1:n})
+=\prod_{i=1}^n \frac{\lambda^{x_i}e^{-\lambda}}{x_i!}
+=\frac{\lambda^{\sum_{i=1}^n x_i}e^{-n\lambda}}{\prod_{i=1}^n x_i!}.
+$$
+
+The log-likelihood is $$
+\ell(\lambda)=\log L(\lambda\mid x_{1:n})
+=\sum_{i=1}^n x_i\log\lambda - n\lambda - \sum_{i=1}^n \log(x_i!).
+$$
+
+Differentiate with respect to $\lambda$: $$
+\ell'(\lambda)=\frac{\sum_{i=1}^n x_i}{\lambda}-n.
+$$ Set $\ell'(\lambda)=0$ to find the critical point: $$
+\frac{\sum_{i=1}^n x_i}{\lambda}-n=0
+\quad\Longrightarrow\quad
+\lambda=\frac{1}{n}\sum_{i=1}^n x_i \equiv \bar{x}.
+$$ Thus, the MLE is $$
+\hat{\lambda}=\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i.
+$$
+
+To verify this critical point is a maximum, compute the second derivative: $$
+\ell''(\lambda)=-\frac{\sum_{i=1}^n x_i}{\lambda^2}.
+$$ For $\lambda>0$, we have $\lambda^2>0$ and $\sum_{i=1}^n x_i\ge 0$, so $$
+\ell''(\lambda)\le 0,
+$$ and if $\sum_{i=1}^n x_i>0$ then $\ell''(\lambda)<0$ for all $\lambda>0$, implying $\ell(\lambda)$ is strictly concave and the critical point $\hat{\lambda}=\bar{x}$ is the unique maximizer.
+
+(If $\sum_{i=1}^n x_i=0$, then $\ell(\lambda)=-n\lambda-\sum_{i=1}^n\log(x_i!)$, which is strictly decreasing in $\lambda$, so the supremum occurs at the boundary $\lambda\downarrow 0$; in practice one reports $\hat{\lambda}=0$.)
+
+## Exercise 3
+
+**Verify using a grid-search that your solution matches to the calculus based one, where you may assume for simplicity that** $\sum_i x_i = 500.$ **You may assume 100 observations. (Hint: show that the approximated MLE is 5.)**
+
+```{r}
+# Grid-search verification of Poisson MLE
+# Given: sum(x_i) = 500, n = 100  => calculus MLE: lambda_hat = 500/100 = 5
+
+S <- 500
+n <- 100
+lambda_hat_calc <- S / n
+
+# Log-likelihood up to an additive constant (drops sum(log(x_i!)) since it doesn't depend on lambda)
+loglik <- function(lambda, S, n) {
+  ifelse(lambda > 0, S * log(lambda) - n * lambda, -Inf)
+}
+
+# Create a fine grid around the expected MLE
+lambda_grid <- seq(0.001, 15, by = 0.001)
+ll_vals <- loglik(lambda_grid, S, n)
+
+# Grid-search MLE
+lambda_hat_grid <- lambda_grid[which.max(ll_vals)]
+
+# Print results
+cat("Calculus-based MLE (S/n):", lambda_hat_calc, "\n")
+cat("Grid-search MLE:", lambda_hat_grid, "\n")
+cat("Absolute difference:", abs(lambda_hat_grid - lambda_hat_calc), "\n")
+
+# Visualization: grid-search MLE 
+plot(lambda_grid, ll_vals, type = "l",
+     xlab = expression(lambda),
+     ylab = "log-likelihood (up to a constant)")
+abline(v = lambda_hat_grid, lty = 2)
+legend("topright",
+       legend = "grid-search MLE",
+       lty = 2,
+       bty = "n")
+```
 
 ## Exercise 4 (Derived from Chapter 2 of BMLR).
 
-**The hot hand in basketball.**  @Gilovich1985 wrote a controversial but compelling article claiming that there is no such thing as “the hot hand” in basketball.  That is, there is no empirical evidence that shooters have stretches where they are more likely to make consecutive shots, and basketball shots are essentially independent events.  One of the many ways they tested for evidence of a “hot hand” was to record sequences of shots for players under game conditions and determine if players are more likely to make shots after made baskets than after misses.  For instance, assume we recorded data from one player's first 5 three-point attempts over a 5-game period.  We can assume games are independent, but we’ll consider two models for shots within a game:
+**The hot hand in basketball. @Gilovich1985 wrote a controversial but compelling article claiming that there is no such thing as “the hot hand” in basketball. That is, there is no empirical evidence that shooters have stretches where they are more likely to make consecutive shots, and basketball shots are essentially independent events. One of the many ways they tested for evidence of a “hot hand” was to record sequences of shots for players under game conditions and determine if players are more likely to make shots after made baskets than after misses. For instance, assume we recorded data from one player's first 5 three-point attempts over a 5-game period. We can assume games are independent, but we’ll consider two models for shots within a game:**
 
-- No Hot Hand (1 parameter): $p_B$ = probability of making a basket (thus $1-p_B$ = probability of not making a basket).
+-   **No Hot Hand (1 parameter):** $p_B$ **= probability of making a basket (thus** $1-p_B$ **= probability of not making a basket).**
 
-- Hot Hand (2 parameters): $p_B$ = probability of making a basket after a miss (or the first shot of a game); $p_{B|B}$ = probability of making a basket after making the previous shot.
+-   **Hot Hand (2 parameters):** $p_B$ **= probability of making a basket after a miss (or the first shot of a game);** $p_{B|B}$ **= probability of making a basket after making the previous shot.**
 
-a. Fill out Table \@ref(tab:hothandchp2)---write out the contribution of each game to the likelihood for both models along with the total likelihood for each model.
+a.  **Fill out Table** \@ref(tab:hothandchp2)**---write out the contribution of each game to the likelihood for both models along with the total likelihood for each model.**
 
-b. Given that, for the No Hot Hand model, $\textrm{Lik}(p_B)=p_B^{10}(1-p_B)^{15}$ for the 5 games where we collected data, how do we know that 0.40 (the maximum likelihood estimator (MLE) of $p_B$) is a better estimate than, say, 0.30?
+b.  **Given that, for the No Hot Hand model,** $\textrm{Lik}(p_B)=p_B^{10}(1-p_B)^{15}$ **for the 5 games where we collected data, how do we know that 0.40 (the maximum likelihood estimator (MLE) of** $p_B$**) is a better estimate than, say, 0.30?**
 
-c. Find the MLEs for the parameters in each model, and then use those MLEs to determine if there's significant evidence that the hot hand exists using a likelihood ratio test (LRT). Be sure to specify the test and provide all details of your approach, including reproducible code used. 
+    ```{r}
 
-| Game | First five shots  | Likelihood (no hot hand) | Likelihood (hot hand)
-|--------|-----------------|--------------------------|-----------------------|
-| 1      | BMMBB            |                         |                       |
-| 2      | MBMBM            |                         |                       |
-| 3      | MMBBB            |                         |                       |
-| 4      | BMMMB            |                         |                       |
-| 5      | MMMMM            |                         |                       |
+    # Given counts
+    B <- 10      # number of baskets
+    n <- 25      # total shots
+    M <- n - B   # number of misses
 
+    # Log-likelihood function for p_B
+    loglik <- function(p, B, M) {
+      B * log(p) + M * log(1 - p)
+    }
 
+    # Compute log-likelihoods
+    ll_40 <- loglik(0.40, B, M)
+    ll_30 <- loglik(0.30, B, M)
 
+    # Compare
+    ll_40
+    ll_30
+    ll_40 - ll_30
+    exp(ll_40 - ll_30)
+    ```
+
+    The log-likelihood at $p_B = 0.40$ is higher than at $p_B = 0.30$, indicating that the observed data are more compatible with a shooting probability of $0.40$. In fact, the likelihood ratio of approximately $1.76$ shows that the data are about $1.76$ times more likely under $p_B = 0.40$ than under $p_B = 0.30$.
+
+c.  **Find the MLEs for the parameters in each model, and then use those MLEs to determine if there's significant evidence that the hot hand exists using a likelihood ratio test (LRT). Be sure to specify the test and provide all details of your approach, including reproducible code used.**
+
+    ```{r}
+    games <- c("BMMBB","MBMBM","MMBBB","BMMMB","MMMMM")
+    n_games <- length(games)
+
+    # ---- No hot hand (1-param): p_B
+    all_shots <- unlist(strsplit(paste(games, collapse=""), ""))
+    B_total <- sum(all_shots == "B")
+    n_total <- length(all_shots)
+
+    p_hat_noHH <- B_total / n_total
+
+    loglik_noHH <- function(p, B, n){
+      if(p <= 0 || p >= 1) return(-Inf)
+      B*log(p) + (n-B)*log(1-p)
+    }
+
+    ll0_hat <- loglik_noHH(p_hat_noHH, B_total, n_total)
+
+    # ---- Hot hand (2-param): p_B (after miss or first), p_BB (after basket)
+    s0 <- n0 <- s1 <- n1 <- 0
+
+    for(seq in games){
+      x <- unlist(strsplit(seq, ""))
+
+      # first shot counts as "after miss or first" category
+      n0 <- n0 + 1
+      if(x[1] == "B") s0 <- s0 + 1
+
+      # transitions
+      for(t in 2:length(x)){
+        prev <- x[t-1]; curr <- x[t]
+        if(prev == "M"){
+          n0 <- n0 + 1
+          if(curr == "B") s0 <- s0 + 1
+        } else { # prev == "B"
+          n1 <- n1 + 1
+          if(curr == "B") s1 <- s1 + 1
+        }
+      }
+    }
+
+    p_hat_HH  <- s0 / n0
+    pBB_hat_HH <- s1 / n1
+
+    loglik_HH <- function(p, pBB, s0, n0, s1, n1){
+      if(p <= 0 || p >= 1 || pBB <= 0 || pBB >= 1) return(-Inf)
+      s0*log(p) + (n0-s0)*log(1-p) + s1*log(pBB) + (n1-s1)*log(1-pBB)
+    }
+
+    ll1_hat <- loglik_HH(p_hat_HH, pBB_hat_HH, s0, n0, s1, n1)
+
+    # ---- LRT
+    D <- 2*(ll1_hat - ll0_hat)
+    p_value <- 1 - pchisq(D, df = 1)
+
+    cat("NoHH MLE p_B =", p_hat_noHH, "\n")
+    cat("HH  MLE p_B =", p_hat_HH, " ; p_B|B =", pBB_hat_HH, "\n")
+    cat("LRT statistic D =", D, "\n")
+    cat("p-value =", p_value, "\n")
+
+    ```
+
+    To test for evidence of a hot hand, we used a likelihood ratio test (LRT) to compare the no–hot–hand model, which assumes a single shooting probability $p_B$, against the hot–hand model, which allows the probability of making a basket to depend on whether the previous shot was made. The parameters in each model were estimated using maximum likelihood estimation, and the test statistic was computed as $$
+    D = 2\big(\ell_{\text{HH}}(\hat p_B,\hat p_{B\mid B}) - \ell_{\text{NoHH}}(\hat p_B)\big).
+    $$Under the null hypothesis of no hot hand ($p_{B\mid B} = p_B$), the test statistic $D$ is asymptotically $\chi^2$-distributed with 1 degree of freedom. Using this distribution, we obtained $D \approx 0.033$ and a p-value of $0.856$, leading us to fail to reject the null hypothesis and conclude that there is no statistically significant evidence of a hot hand in these data.
+
+| Game | First five shots | Likelihood (no hot hand) | Likelihood (hot hand) |
+|-----------------|-----------------|---------------------|-------------------|
+| 1 | BMMBB | $\textrm{Lik}(p_B)=p_B^{3}(1-p_B)^{2}$ | $\textrm{Lik}(p_B)=p_B^{2}(1-p_B)^{1}p_{B|B}^{1}(1-p_{B|B})^{1}$ |
+| 2 | MBMBM | $\textrm{Lik}(p_B)=p_B^{2}(1-p_B)^{3}$ | $\textrm{Lik}(p_B)=p_B^{2}(1-p_B)^{1}(1-p_{B|B})^{2}$ |
+| 3 | MMBBB | $\textrm{Lik}(p_B)=p_B^{3}(1-p_B)^{2}$ | $\textrm{Lik}(p_B)=p_B^{1}(1-p_B)^{2}p_{B|B}^{2}$ |
+| 4 | BMMMB | $\textrm{Lik}(p_B)=p_B^{2}(1-p_B)^{3}$ | $\textrm{Lik}(p_B)=p_B^{2}(1-p_B)^{2}(1-p_{B|B})^{1}$ |
+| 5 | MMMMM | $\textrm{Lik}(p_B)=(1-p_B)^{5}$ | $\textrm{Lik}(p_B)=(1-p_B)^{5}$ |
 
 # Grading
 
