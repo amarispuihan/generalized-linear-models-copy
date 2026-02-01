@@ -99,9 +99,9 @@ b.  **Fit a Poisson regression model including Width, Weight, and Spine as predi
     )
 
     # Display model summary
-    crab_pois %>% 
-      tidy(conf.int = TRUE, conf.level = 0.95) %>% 
-      mutate(across(where(is.numeric), round, 3)) %>% 
+    crab_pois |>
+      tidy(conf.int = TRUE, conf.level = 0.95)|>
+      mutate(across(where(is.numeric), round, 3)) |>
       kable( caption = "Poisson Regression of Number of Satellites on Female Characteristics",
              col.names = c("Term", 
                            "Estimate", 
@@ -119,17 +119,55 @@ Because this is a Poisson regression with a log link, the coefficient for Spine 
 
 <!-- -->
 
-3.  Use the scenario from the previous exercise to answer questions (a) - (d).
+3.  **Use the scenario from the previous exercise to answer questions (a) - (d).**
 
 <!-- -->
 
-a.  We would like to fit a quasi-Poisson regression model for this data. Briefly explain why we may want to consider fitting a quasi-Poisson regression model for this data.
+a.  **We would like to fit a quasi-Poisson regression model for this data. Briefly explain why we may want to consider fitting a quasi-Poisson regression model for this data.**
 
-b.  Fit a quasi-Poisson regression model that corresponds with the model chosen in the previous exercise. Display the model.
+    A quasi-Poisson regression is appropriate when there is overdispersion in count data—that is, when the variance of the response exceeds its mean, violating the Poisson assumption $\operatorname{Var}(Y) = \mathbb{E}(Y)$. From the histogram and earlier Poisson fit, the satellite counts show a large number of zeros and a long right tail, suggesting extra variability that a standard Poisson model may not adequately capture. The quasi-Poisson model relaxes the variance assumption while keeping the same mean structure.
 
-c.  What is the estimated dispersion parameter? Show how this value is calculated.
+b.  **Fit a quasi-Poisson regression model that corresponds with the model chosen in the previous exercise. Display the model.**
 
-d.  How do the estimated coefficients change compared to the model chosen in the previous exercise? How do the standard errors change?
+    ```{r}
+
+    # Fit quasi-Poisson regression
+    crab_qpois <- glm(
+      Satellite ~ Width + Weight + Spine,
+      family = quasipoisson(link = "log"),
+      data = crab
+    )
+
+    # Display model results with 95% CIs
+    crab_qpois|>
+      tidy(conf.int = TRUE, conf.level = 0.95)|>
+      mutate(across(where(is.numeric), round, 3)) |>
+      kable(
+        caption = "Quasi-Poisson Regression of Number of Satellites on Female Characteristics",
+        col.names = c("Term", "Estimate", "Std. Error", "t value", "p-value",
+                      "Lower 95% CI", "Upper 95% CI")
+      )
+
+    ```
+
+c.  **What is the estimated dispersion parameter? Show how this value is calculated.**
+
+    ```{r}
+    # Estimated dispersion parameter
+    summary(crab_qpois)$dispersion
+    ```
+
+    It is calculated through: $\hat{\phi} = \dfrac{\sum_{i=1}^{n} r_{P,i}^{2}}{n - p}$
+
+    The dispersion parameter is estimated by taking the sum of squared Pearson residuals and dividing by the residual degrees of freedom (n-p). This quantity measures how much the observed variability in the response exceeds the variability assumed under a standard Poisson model, with values greater than 1 indicating overdispersion. To verify:
+
+    ```{r}
+    sum(residuals(crab_qpois, type = "pearson")^2) / df.residual(crab_qpois)
+    ```
+
+d.  **How do the estimated coefficients change compared to the model chosen in the previous exercise? How do the standard errors change?**
+
+    The estimated coefficients are identical in the Poisson and quasi-Poisson models, so the estimated effects of width, weight, and spine on the expected number of satellites do not change. This is because both models use the same functional form to model the mean response. However, the standard errors are larger in the quasi-Poisson model because they are explicitly scaled to account for overdispersion in the data. Specifically, the quasi-Poisson model inflates the Poisson standard errors by a factor related to the square root of the estimated dispersion parameter, reflecting the fact that the variability in the data is greater than what the Poisson model assumes. This scaling increases uncertainty in the estimates, resulting in wider confidence intervals and larger p-values, and therefore leads to more conservative statistical inference.
 
 <!-- -->
 
