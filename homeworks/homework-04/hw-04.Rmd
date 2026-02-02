@@ -436,9 +436,36 @@ ggplot(emp_logodds, aes(x = ideologybin, y = log_odds, group = 1)) +
 
 The plot shows that the empirical log-odds of having at least one issue statement vary non-linearly with ideology. Candidates with moderate ideology values—particularly those near the center to moderately right-leaning bins—have the highest log-odds of commenting on at least one issue, indicating they are most likely to cross the zero hurdle. In contrast, candidates at the ideological extremes, especially at the far right end of the scale, exhibit substantially lower log-odds, suggesting a greater likelihood of remaining silent. Overall, the relationship between ideology and the probability of issuing at least one statement is not monotonic, which supports the use of a flexible model such as a hurdle model rather than a simple Poisson regression.
 
-c.  Create a hurdle model with ideology and democrat as predictors in both parts. Display the model. Interpret ideology in both parts of the model.
+c.  **Create a hurdle model with ideology and democrat as predictors in both parts. Display the model. Interpret ideology in both parts of the model.**
 
-d.  Repeat (d), but include an interaction in both parts. Interpret the interaction in the zero hurdle part of the model.
+    ```{r}
+    # Fit hurdle model (Poisson count part by default)
+    m1 <- hurdle(
+      totalIssuePages ~ ideology + democrat | ideology + democrat,
+      data = amb,
+      dist = "poisson"
+    )
+
+    summary(m1)
+    ```
+
+    Zero hurdle part (binary model: having at least one issue statement): In the zero hurdle component, ideology has a positive and statistically significant coefficient (estimate: 0.575, p \< 0.001). This indicates that as a candidate’s ideology score increases, the log-odds of having at least one issue statement increase, holding party affiliation constant. Substantively, candidates with higher ideology values are more likely to cross the hurdle from silence to engagement by commenting on at least one issue. This suggests that ideology plays an important role in explaining whether candidates choose to speak at all on policy issues.
+
+    Count part (positive counts only): In the count component, ideology has a coefficient very close to zero and is not statistically significant (estimate: -0.006, p = 0.777). This implies that among candidates who have already commented on at least one issue, ideology is not meaningfully associated with the number of issue pages they produce. In other words, once candidates decide to engage, ideology does not explain variation in how many issues they comment on.
+
+d.  **Repeat (d), but include an interaction in both parts. Interpret the interaction in the zero hurdle part of the model.**
+
+    ```{r}
+    m2 <- hurdle(
+      totalIssuePages ~ ideology * democrat | ideology * democrat,
+      data = amb,
+      dist = "poisson"
+    )
+
+    summary(m2)
+    ```
+
+In the zero hurdle component, the interaction between ideology and party affiliation is negative and statistically significant, indicating that the relationship between ideology and the probability of having at least one issue statement differs by party. Specifically, while higher ideology values are associated with a higher likelihood of commenting on at least one issue for Republicans (the reference group), this positive association is substantially weaker for Democrats. In fact, the negative interaction implies that as ideology increases, Democrats experience a much smaller increase—or even a decrease—in the odds of crossing the hurdle compared to Republicans. Thus, ideology is a strong predictor of whether candidates speak at all, but its effect depends importantly on party affiliation, with ideology playing a more prominent role in predicting non-silence among Republicans than among Democrats.
 
 # Grading
 
