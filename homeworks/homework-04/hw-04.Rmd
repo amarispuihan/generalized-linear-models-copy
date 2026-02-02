@@ -18,6 +18,13 @@ Instructions:
 
 These exercises are derived from BMLR, Chapter 4.
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
 <!--BMLR Sec 4.11.1 Ex 11-->
 
 1.  
@@ -296,7 +303,7 @@ par(mfrow = c(1, 1))
 
 ```
 
-c.  Make an argument that if you want a $\textrm{NegBinom}(r, p)$ random variable, you can instead sample from a Poisson distribution, where the $\lambda$ values are themselves sampled from a gamma distribution with parameters $r$ and $\lambda' = \frac{p}{1-p}$. You may show equivalency via the simulations or mathematically, however, make sure your arguments are precise and clear.
+c.  **Make an argument that if you want a** $\textrm{NegBinom}(r, p)$ **random variable, you can instead sample from a Poisson distribution, where the** $\lambda$ **values are themselves sampled from a gamma distribution with parameters** $r$ **and** $\lambda' = \frac{p}{1-p}$**. You may show equivalency via the simulations or mathematically, however, make sure your arguments are precise and clear.**
 
 Suppose $\Lambda \sim \textrm{Gamma}(r,\lambda')$ with shape parameter $r$ and rate parameter $\lambda'$, and conditional on $\Lambda$, let $X \mid \Lambda \sim \textrm{Poisson}(\Lambda)$. We derive the marginal distribution of $X$.
 
@@ -356,27 +363,78 @@ par(mfrow = c(1,1))
 
 <!-- -->
 
-5.  In a 2018 study, Chapp et al. (2018) scraped every issue statement from webpages of candidates for the U.S. House of Representatives, counting the number of issues candidates commented on and scoring the level of ambiguity of each statement. We will focus on the issue counts, and determining which attributes (of both the district as a whole and the candidates themselves) are associated with candidate silence (commenting on 0 issues) and a willingness to comment on a greater number of issues. The data set is in ambiguity.csv in the data folder . This analysis will focus on the following variables:
+5.  **In a 2018 study, Chapp et al. (2018) scraped every issue statement from webpages of candidates for the U.S. House of Representatives, counting the number of issues candidates commented on and scoring the level of ambiguity of each statement. We will focus on the issue counts, and determining which attributes (of both the district as a whole and the candidates themselves) are associated with candidate silence (commenting on 0 issues) and a willingness to comment on a greater number of issues. The data set is in ambiguity.csv in the data folder . This analysis will focus on the following variables:**
 
--   name : candidate name
+-   **name : candidate name**
 
--   distID : unique identification number for Congressional district
+-   **distID : unique identification number for Congressional district**
 
--   ideology : candidate left-right orientation
+-   **ideology : candidate left-right orientation**
 
--   democrat : 1 if Democrat, 0 if Republican
+-   **democrat : 1 if Democrat, 0 if Republican**
 
--   totalIssuePages : number of issues candidates commented on (response)
+-   **totalIssuePages : number of issues candidates commented on (response)**
 
-See @roback2021beyond for the full list of variables.
+**See @roback2021beyond for the full list of variables.**
 
-We will use a **hurdle model** to analyze the data. A hurdle model is similar to a zero-inflated Poisson model, but instead of assuming that "zeros" are comprised of two distinct groups---those who would always be 0 and those who happen to be 0 on this occasion---the hurdle model assumes that "zeros" are a single entity. Therefore, in a hurdle model, cases are classified as either "zeros" or "non-zeros", where "non-zeros" *hurdle* the 0 threshold---they must always have counts of 1 or above.
+**We will use a hurdle model to analyze the data. A hurdle model is similar to a zero-inflated Poisson model, but instead of assuming that "zeros" are comprised of two distinct groups---those who would always be 0 and those who happen to be 0 on this occasion---the hurdle model assumes that "zeros" are a single entity. Therefore, in a hurdle model, cases are classified as either "zeros" or "non-zeros", where "non-zeros" *hurdle* the 0 threshold---they must always have counts of 1 or above.**
 
-We will use the `pscl` package and the `hurdle` function in it to analyze a hurdle model. Note that coefficients in the "zero hurdle model" section of the output relate predictors to the log-odds of being a *non-zero* (i.e., having at least one issue statement), which is opposite of the ZIP model.
+**We will use the `pscl` package and the `hurdle` function in it to analyze a hurdle model. Note that coefficients in the "zero hurdle model" section of the output relate predictors to the log-odds of being a *non-zero* (i.e., having at least one issue statement), which is opposite of the ZIP model.**
 
-a.  Visualize the distribution of the response variable totalIssuePages. Why might we consider using a hurdle model compared to a Poisson model? Why is a zero-inflated Poisson model not appropriate in this scenario?
+a.  **Visualize the distribution of the response variable totalIssuePages. Why might we consider using a hurdle model compared to a Poisson model? Why is a zero-inflated Poisson model not appropriate in this scenario?**
 
-b.  Create a plot of the empirical log odds of having at least one issue statement by ideology. You may want to group ideology values first. What can you conclude from this plot?
+```{r}
+library(pscl)
+amb <- read.csv("ambiguity.csv")
+
+# Histogram (count-style bins)
+ggplot(amb, aes(x = totalIssuePages)) +
+  geom_histogram(binwidth = 1, boundary = -0.5, color = "white") +
+  labs(x = "totalIssuePages", y = "Count",
+       title = "Distribution of totalIssuePages") + 
+  theme_minimal()
+```
+
+*There is a substantial mass of candidates with totalIssuePages = 0, far more than a standard Poisson model would typically generate given the distribution of the positive counts. Among candidates who do comment on issues, the number of issue pages varies widely and is right-skewed, resembling a Poisson-like count distribution but clearly conditional on being nonzero. This suggests a two-stage process: First, whether a candidate chooses to comment on any issue at all (zero vs nonzero). Second, how many issues they comment on given that they comment on at least one.*
+
+*A zero-inflated Poisson (ZIP) model is not appropriate here because a ZIP model assumes that zeros come from two latent sources: “Structural zeros” (cases that will always be zero), and “Sampling zeros” (cases that follow the Poisson process but happened to be zero this time). That assumption does not fit the political context of this data well. Here, a candidate with zero issue statements is simply silent, not a fundamentally different type of candidate who could never comment. There is no strong theoretical reason to believe there are two hidden kinds of zero-issue candidates. The hurdle model, by contrast, treats all zeros as the same meaningful outcome, which is much more consistent with the research question.*
+
+b.  **Create a plot of the empirical log odds of having at least one issue statement by ideology. You may want to group ideology values first. What can you conclude from this plot?**
+
+```{r}
+
+amb2 <- amb |>
+  filter(!is.na(ideology)) |>
+  mutate(
+    nonzero = as.integer(totalIssuePages > 0),
+    ideologybin = ggplot2::cut_interval(ideology, n = 20)  
+  )
+
+emp_logodds <- amb2 |>
+  group_by(ideologybin) |>
+  summarise(
+    n = n(),
+    prop_nonzero = mean(nonzero),
+    .groups = "drop"
+  ) |>
+  # avoid infinite log-odds if prop is 0 or 1
+  mutate(
+    prop_nonzero_adj = pmin(pmax(prop_nonzero, 1/(2*n)), 1 - 1/(2*n)),
+    log_odds = log(prop_nonzero_adj / (1 - prop_nonzero_adj))
+  )
+
+ggplot(emp_logodds, aes(x = ideologybin, y = log_odds, group = 1)) +
+  geom_point() +
+  geom_smooth(se=FALSE) +
+  labs(
+    x = "Ideology (binned)",
+    y = "Empirical log-odds of having at least 1 issue statement",
+    title = "Empirical log-odds of Nonzero totalIssuePages by Ideology Bin"
+  ) +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1)) 
+```
+
+The plot shows that the empirical log-odds of having at least one issue statement vary non-linearly with ideology. Candidates with moderate ideology values—particularly those near the center to moderately right-leaning bins—have the highest log-odds of commenting on at least one issue, indicating they are most likely to cross the zero hurdle. In contrast, candidates at the ideological extremes, especially at the far right end of the scale, exhibit substantially lower log-odds, suggesting a greater likelihood of remaining silent. Overall, the relationship between ideology and the probability of issuing at least one statement is not monotonic, which supports the use of a flexible model such as a hurdle model rather than a simple Poisson regression.
 
 c.  Create a hurdle model with ideology and democrat as predictors in both parts. Display the model. Interpret ideology in both parts of the model.
 
