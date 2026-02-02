@@ -171,23 +171,188 @@ d.  **How do the estimated coefficients change compared to the model chosen in t
 
 <!-- -->
 
-4.  The goal of this exercise is to use simulation to understand the equivalency between a gamma-Poisson mixture and a negative binomial distribution.
+4.  **The goal of this exercise is to use simulation to understand the equivalency between a gamma-Poisson mixture and a negative binomial distribution.**
 
-Remember to set a seed so your simulations are reproducible!
+**Remember to set a seed so your simulations are reproducible!**
 
 <!--BMLR Sec 3.7.2, Ex 2-->
 
-a.  Use the R function rpois() to generate 10,000 $x_i$ from a regular Poisson distribution, $X \sim \textrm{Poisson}(\lambda=1.5)$. Plot a histogram of this distribution and note its mean and variance. Next, let $Y \sim \textrm{Gamma}(r = 3, \lambda = 2)$ and use rgamma() to generate 10,000 random $y_i$ from this distribution.
+a.  **Use the R function rpois() to generate 10,000** $x_i$ **from a regular Poisson distribution,** $X \sim \textrm{Poisson}(\lambda=1.5)$**. Plot a histogram of this distribution and note its mean and variance. Next, let** $Y \sim \textrm{Gamma}(r = 3, \lambda = 2)$ **and use rgamma() to generate 10,000 random** $y_i$ **from this distribution.**
 
-Now, consider 10,000 different Poisson distributions where $\lambda_i = y_i$. Randomly generate one $z_i$ from each Poisson distribution. Plot a histogram of these $z_i$ and compare it to your original histogram of $X$ (where $X \sim \textrm{Poisson}(1.5)$). How do the means and variances compare?
+```{r}
+set.seed(123)
+n <- 10000
 
-b.  A negative binomial distribution can actually be expressed as a gamma-Poisson mixture. In Part a, you looked at a gamma-Poisson mixture $Z \sim \textrm{Poisson}(\lambda)$ where $\lambda \sim \textrm{Gamma}(r = 3, \lambda' = 2)$.
+# Generate 10,000 Poisson observations
+x <- rpois(n, lambda = 1.5)
 
-Find the parameters of a negative binomial distribution $X \sim \textrm{NegBinom}(r, p)$ such that $X$ is equivalent to $Z$. As a hint, the means of both distributions must be the same, so $\frac{r(1-p)}{p} = \frac{3}{2}$.
+# Compute mean and variance
+x_mean <- mean(x)
+x_var  <- var(x)
 
-Show through histograms and summary statistics that your negative binomial distribution is equivalent to the gamma-Poisson mixture. You can use rnbinom() in R.
+# Histogram
+hist(
+  x,
+  breaks = seq(-0.5, max(x) + 0.5, by = 1),
+  main = "Histogram of Poisson(1.5)",
+  xlab = "x",
+  col = "lightgray"
+)
+
+# Add mean and variance to the plot
+legend(
+  "topright",
+  legend = c(
+    paste("Mean =", round(x_mean, 3)),
+    paste("Variance =", round(x_var, 3))
+  ),
+  bty = "n"
+)
+```
+
+```{r}
+
+# Generate 10,000 Gamma observations
+y <- rgamma(n, shape = 3, rate = 2)
+
+```
+
+**Now, consider 10,000 different Poisson distributions where** $\lambda_i = y_i$**. Randomly generate one** $z_i$ **from each Poisson distribution. Plot a histogram of these** $z_i$ **and compare it to your original histogram of** $X$ **(where** $X \sim \textrm{Poisson}(1.5)$**). How do the means and variances compare?**
+
+```{r}
+
+# Mixture counts: Z_i | Y_i ~ Poisson(lambda_i = Y_i)
+z <- rpois(n, lambda = y)
+
+# Means and variances
+x_mean <- mean(x); x_var <- var(x)
+z_mean <- mean(z); z_var <- var(z)
+
+# Use common breaks so histograms are comparable
+brks <- seq(-0.5, max(c(x, z)) + 0.5, by = 1)
+
+par(mfrow = c(1, 2))
+
+hist(x, breaks = brks, col = "lightgray",
+     main = "X ~ Poisson(1.5)", xlab = "Count")
+legend("topright",
+       legend = c(paste("Mean =", round(x_mean, 3)),
+                  paste("Var  =", round(x_var, 3))),
+       bty = "n")
+
+hist(z, breaks = brks, col = "lightgray",
+     main = "Z ~ Poisson(lambda_i = Y_i)", xlab = "Count")
+legend("topright",
+       legend = c(paste("Mean =", round(z_mean, 3)),
+                  paste("Var  =", round(z_var, 3))),
+       bty = "n")
+
+par(mfrow = c(1, 1))
+
+```
+
+The means of the two distributions are very similar, both being close to 1.5. However, the variance of the gamma–Poisson mixture is substantially larger than the variance of the standard Poisson distribution. This occurs because the mixture includes additional variability from the random Poisson rates, whereas the standard Poisson distribution assumes a fixed rate and therefore has variance approximately equal to its mean.
+
+**b. A negative binomial distribution can actually be expressed as a gamma-Poisson mixture. In Part a, you looked at a gamma-Poisson mixture** $Z \sim \textrm{Poisson}(\lambda)$ **where** $\lambda \sim \textrm{Gamma}(r = 3, \lambda' = 2)$**.**
+
+**Find the parameters of a negative binomial distribution** $X \sim \textrm{NegBinom}(r, p)$ **such that** $X$ **is equivalent to** $Z$**. As a hint, the means of both distributions must be the same, so** $\frac{r(1-p)}{p} = \frac{3}{2}$**.**
+
+**Show through histograms and summary statistics that your negative binomial distribution is equivalent to the gamma-Poisson mixture. You can use rnbinom() in R.**
+
+```{r}
+# Given parameters from Gamma distribution
+r <- 3
+mean_lambda <- 3 / 2
+
+# Solve for p
+p <- r / (r + mean_lambda)
+
+# Equivalent Negative Binomial: X ~ NegBinom(r=3, p=2/3)
+x_nb <- rnbinom(n, size = 3, prob = p)
+
+# Summary statistics
+nb_mean <- mean(x_nb); nb_var <- var(x_nb)
+
+# Common breaks for comparable histograms
+brks <- seq(-0.5, max(c(z, x_nb)) + 0.5, by = 1)
+
+par(mfrow = c(1, 2))
+
+hist(z, breaks = brks, col = "lightgray",
+     main = "Gamma–Poisson mixture (Z)", xlab = "count")
+legend("topright",
+       legend = c(paste("Mean =", round(z_mean, 3)),
+                  paste("Var  =", round(z_var, 3))),
+       bty = "n")
+
+hist(x_nb, breaks = brks, col = "lightgray",
+     main = "NegBinom(size=3, prob=2/3)", xlab = "count")
+legend("topright",
+       legend = c(paste("Mean =", round(nb_mean, 3)),
+                  paste("Var  =", round(nb_var, 3))),
+       bty = "n")
+
+par(mfrow = c(1, 1))
+
+```
 
 c.  Make an argument that if you want a $\textrm{NegBinom}(r, p)$ random variable, you can instead sample from a Poisson distribution, where the $\lambda$ values are themselves sampled from a gamma distribution with parameters $r$ and $\lambda' = \frac{p}{1-p}$. You may show equivalency via the simulations or mathematically, however, make sure your arguments are precise and clear.
+
+Suppose $\Lambda \sim \textrm{Gamma}(r,\lambda')$ with shape parameter $r$ and rate parameter $\lambda'$, and conditional on $\Lambda$, let $X \mid \Lambda \sim \textrm{Poisson}(\Lambda)$. We derive the marginal distribution of $X$.
+
+By the law of total probability, $\mathbb{P}(X=x) = \int_{0}^{\infty} \mathbb{P}(X=x \mid \Lambda=\lambda)\, f_{\Lambda}(\lambda)\, d\lambda$.
+
+The conditional Poisson probability mass function is $\mathbb{P}(X=x \mid \Lambda=\lambda) = \dfrac{e^{-\lambda}\lambda^{x}}{x!}$, and the Gamma density (shape $r$, rate $\lambda'$) is $f_{\Lambda}(\lambda) = \dfrac{(\lambda')^{r}}{\Gamma(r)} \lambda^{r-1} e^{-\lambda'\lambda}$ for $\lambda>0$.
+
+Substituting these expressions yields $\mathbb{P}(X=x)
+= \int_{0}^{\infty} \dfrac{e^{-\lambda}\lambda^{x}}{x!}\cdot \dfrac{(\lambda')^{r}}{\Gamma(r)} \lambda^{r-1} e^{-\lambda'\lambda}\, d\lambda$.
+
+Combining like terms gives $\mathbb{P}(X=x)
+= \dfrac{(\lambda')^{r}}{x!\,\Gamma(r)} \int_{0}^{\infty} \lambda^{x+r-1} e^{-(1+\lambda')\lambda}\, d\lambda$.
+
+Using the Gamma integral identity $\int_{0}^{\infty} \lambda^{k-1} e^{-a\lambda}\, d\lambda = \dfrac{\Gamma(k)}{a^{k}}$ for $k>0$ and $a>0$, with $k=x+r$ and $a=1+\lambda'$, we obtain $\mathbb{P}(X=x)
+= \dfrac{\Gamma(x+r)}{x!\,\Gamma(r)} \cdot \dfrac{(\lambda')^{r}}{(1+\lambda')^{x+r}}$.
+
+Now let $\lambda' = \dfrac{p}{1-p}$. Then $1+\lambda' = 1 + \dfrac{p}{1-p} = \dfrac{1}{1-p}$, $\dfrac{\lambda'}{1+\lambda'} = \dfrac{p/(1-p)}{1/(1-p)} = p$, and $\dfrac{1}{1+\lambda'} = 1-p$.
+
+Substituting these into the expression above gives $\mathbb{P}(X=x)
+= \dfrac{\Gamma(x+r)}{x!\,\Gamma(r)}\, p^{r}(1-p)^{x}$.
+
+For integer $r$, we note that $\dfrac{\Gamma(x+r)}{x!\,\Gamma(r)} = \binom{x+r-1}{x}$.
+
+Therefore, $\mathbb{P}(X=x) = \binom{x+r-1}{x}(1-p)^{x}p^{r}$ for $x=0,1,2,\ldots$.
+
+This is exactly the probability mass function of a $\textrm{NegBinom}(r,p)$ random variable. Hence, sampling $\Lambda \sim \textrm{Gamma}\!\left(r,\lambda'=\dfrac{p}{1-p}\right)$ and then sampling $X \mid \Lambda \sim \textrm{Poisson}(\Lambda)$ produces a negative binomial distribution.
+
+With a large n, the histograms and summary statistics will be extremely close, which empirically supports the proven equivalence:
+
+```{r}
+set.seed(456)
+n <- 100000
+
+r <- 3
+p <- 2/3
+lambda_prime <- p/(1 - p)   # rate for Gamma
+
+# Mixture sample
+lambda <- rgamma(n, shape = r, rate = lambda_prime)
+x_mix <- rpois(n, lambda = lambda)
+
+# Direct NegBinom sample (R parameterization: size=r, prob=p)
+x_nb <- rnbinom(n, size = r, prob = p)
+
+# Compare mean/variance
+c(mean(x_mix), var(x_mix))
+c(mean(x_nb),  var(x_nb))
+
+# Compare histograms
+brks <- seq(-0.5, max(c(x_mix, x_nb)) + 0.5, by = 1)
+par(mfrow = c(1,2))
+hist(x_mix, breaks = brks, col="lightgray", main="Gamma–Poisson mixture", xlab="x")
+hist(x_nb,  breaks = brks, col="lightgray", main="NegBinom(r,p)", xlab="x")
+par(mfrow = c(1,1))
+
+```
 
 <!-- -->
 
