@@ -81,6 +81,16 @@ a.  **Create a histogram of Satellite. Is there preliminary evidence the number 
 
 ```{r}
 
+crab <- crab |>
+  mutate(
+    Spine = factor(Spine, levels = c(1, 2, 3),
+                   labels = c("both_good", "one_worn_broken", "both_worn_broken")),
+    
+    Color = factor(Color, levels = c(1, 2, 3, 4),
+                   labels = c("light_medium", "medium", "dark_medium", "dark"))
+  )
+
+
 ggplot(crab, aes(x = Satellite)) +
   geom_histogram(binwidth = 1, color = "white") +
   labs(
@@ -122,7 +132,9 @@ b.  **Fit a Poisson regression model including Width, Weight, and Spine as predi
 
 c.  **Describe the effect of Spine in terms of the mean number of satellites.**
 
-Because this is a Poisson regression with a log link, the coefficient for Spine represents a multiplicative effect on the mean number of satellites. Holding width and weight constant, a one-unit increase in spine condition (i.e., worse spine condition) is associated with a factor of exp(-0.016) = 0.984 change in the expected number of satellites, corresponding to about a 1.6% decrease in the mean number of satellites. However, this effect is not statistically significant (95% CI includes 0; p=0.768), indicating little evidence that spine condition is meaningfully associated with satellite count.
+Because this is a Poisson regression with a log link, the coefficient for Spine represents a multiplicative effect on the mean number of satellites. In this Poisson regression model, spine condition is treated as a categorical variable, with “both good” serving as the reference group. The coefficient for one worn/broken spine is -0.214, which implies that the expected mean number of satellites is multiplied by 0.81. Thus, holding width and weight constant, female crabs with one worn/broken spine are expected to have about 19% fewer satellites on average compared to female crabs with both spines in good condition.
+
+Similarly, the coefficient for both worn/broken spines is -0.049, corresponding to a multiplicative change of 0.95. This suggests that, controlling for width and weight, female crabs with both spines worn or broken are expected to have about 5% fewer satellites on average compared to female crabs with both spines in good condition. Overall, while the estimated effects are negative, the p-values indicate that spine condition is not a statistically significant predictor of the mean number of satellites in this model.
 
 <!-- -->
 
@@ -132,7 +144,7 @@ Because this is a Poisson regression with a log link, the coefficient for Spine 
 
 a.  **We would like to fit a quasi-Poisson regression model for this data. Briefly explain why we may want to consider fitting a quasi-Poisson regression model for this data.**
 
-    A quasi-Poisson regression is appropriate when there is overdispersion in count data—that is, when the variance of the response exceeds its mean, violating the Poisson assumption $\operatorname{Var}(Y) = \mathbb{E}(Y)$. From the histogram and earlier Poisson fit, the satellite counts show a large number of zeros and a long right tail, suggesting extra variability that a standard Poisson model may not adequately capture. The quasi-Poisson model relaxes the variance assumption while keeping the same mean structure.
+    A quasi-Poisson regression is appropriate when there is over-dispersion in count data—that is, when the variance of the response exceeds its mean, violating the Poisson assumption $\operatorname{Var}(Y) = \mathbb{E}(Y)$. From the histogram and earlier Poisson fit, the satellite counts show a large number of zeros and a long right tail, suggesting extra variability that a standard Poisson model may not adequately capture. The quasi-Poisson model relaxes the variance assumption while keeping the same mean structure.
 
 b.  **Fit a quasi-Poisson regression model that corresponds with the model chosen in the previous exercise. Display the model.**
 
@@ -174,7 +186,7 @@ c.  **What is the estimated dispersion parameter? Show how this value is calcula
 
 d.  **How do the estimated coefficients change compared to the model chosen in the previous exercise? How do the standard errors change?**
 
-    The estimated coefficients are identical in the Poisson and quasi-Poisson models, so the estimated effects of width, weight, and spine on the expected number of satellites do not change. This is because both models use the same functional form to model the mean response. However, the standard errors are larger in the quasi-Poisson model because they are explicitly scaled to account for overdispersion in the data. Specifically, the quasi-Poisson model inflates the Poisson standard errors by a factor related to the square root of the estimated dispersion parameter, reflecting the fact that the variability in the data is greater than what the Poisson model assumes. This scaling increases uncertainty in the estimates, resulting in wider confidence intervals and larger p-values, and therefore leads to more conservative statistical inference.
+    The estimated coefficients are identical in the Poisson and quasi-Poisson models, so the estimated effects of width, weight, and spine on the expected number of satellites do not change. This is because both models use the same functional form to model the mean response. However, the standard errors are larger in the quasi-Poisson model because they are explicitly scaled to account for over-dispersion in the data. Specifically, the quasi-Poisson model inflates the Poisson standard errors by a factor related to the square root of the estimated dispersion parameter, reflecting the fact that the variability in the data is greater than what the Poisson model assumes. This scaling increases uncertainty in the estimates, resulting in wider confidence intervals and larger p-values, and therefore leads to more conservative statistical inference.
 
 <!-- -->
 
