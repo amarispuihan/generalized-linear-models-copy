@@ -4,89 +4,107 @@ author: "STA 310: Homework 5"
 output: pdf_document
 ---
 
-1. The probability density function (PDF) of the Pareto Type I distribution is given by:
+1.  The probability density function (PDF) of the Pareto Type I distribution is given by:
 
-\[
+$$
 f(x) = \frac{\alpha x_m^\alpha}{x^{\alpha+1}} \mathbf{1}_{\{x \geq x_m\}}
-\]
+$$
 
 where:
+
 \begin{itemize}
     \item \( \mathbf{1}_{\{x \geq x_m\}} \) is the indicator function, which is 1 if \( x \geq x_m \) and 0 otherwise.
     \item \( \alpha > 0 \) is the shape parameter.
     \item \( x_m > 0 \) is the scale parameter (minimum possible value) of the data.
 \end{itemize}
 
-Is this a member of the exponential family (in canonical form), where both parameters are unknown? If so, identify the components in canonical form. If not, explain why not. 
+Is this a member of the exponential family (in canonical form), where both parameters are unknown? If so, identify the components in canonical form. If not, explain why not.
+
+$$
+f(x\mid \alpha,x_m)=\frac{\alpha x_m^{\alpha}}{x^{\alpha+1}}\mathbf{1}\{x\ge x_m\},\qquad \alpha>0,\ x_m>0.
+$$
+
+Take logs: $$
+\log f(x\mid \alpha,x_m)=\log\alpha+\alpha\log x_m-(\alpha+1)\log x+\log \mathbf{1}\{x\ge x_m\}.
+$$
+
+If a distribution is in the (regular) exponential family in canonical form, it must be writable as $$
+f(x\mid \eta)=h(x)\exp\{\eta^\top T(x)-A(\eta)\}
+$$with a support (the set of $x$ where $f(x\mid\eta)>0$) that does not depend on $\eta$.
+
+Here the support is $[x_m,\infty)$, which depends on the unknown parameter $x_m$. Equivalently, the factor $\mathbf{1}\{x\ge x_m\}$ depends on the parameter and cannot be absorbed into $h(x)$ (since $h$ may not depend on parameters). Therefore, when $\alpha$ and $x_m$ are both unknown, the Pareto Type I family is not a (regular) exponential family in canonical form.
+
+If $x_m$ were known (fixed), then $$
+f(x\mid \alpha)=\mathbf{1}\{x\ge x_m\}\,\frac{1}{x}\exp\Big\{\alpha\big(\log x_m-\log x\big)+\log\alpha\Big\},
+$$so it can be expressed as a one-parameter exponential family in $\alpha$ (with sufficient statistic $\log x$ up to constants). The obstruction is exactly that the lower cutoff $x_m$ is unknown and changes the support.
 
 \newpage
 
-2. Assume a logistic regression model (i.e., binary regression under canonical link). Assume that $y_i$ is binary with success probability $p$\footnote{This technically should be $p_i$, but for simplicity of the derivation, I am supressing this notation.} and $i=1, \ldots, n.$ Specifically, in (simplified) logistic regression, we have that 
+2.  Assume a logistic regression model (i.e., binary regression under canonical link). Assume that $y_i$ is binary with success probability $p$\footnote{This technically should be $p_i$, but for simplicity of the derivation, I am supressing this notation.} and $i=1, \ldots, n.$ Specifically, in (simplified) logistic regression, we have that
 
 $$
 \log\!\left(\frac{p}{1-p}\right) = X_i^T \boldsymbol\beta_{p \times 1},
 $$
 
 <!-- $$ -->
-<!-- \log\!\left(\frac{p}{1-p}\right) = X_{n \times p} \boldsymbol\beta_{p \times 1}, -->
-<!-- $$ -->
-Note that $X_i^T$ is a row vector where it's dimension is $1 \times p.$
-a. Provide the log-likelihood function as a function of the regression parameters. That is, show that
 
-The log-likelihood function for logistic regression is
-\[
+<!-- \log\!\left(\frac{p}{1-p}\right) = X_{n \times p} \boldsymbol\beta_{p \times 1}, -->
+
+<!-- $$ -->
+
+Note that $X_i^T$ is a row vector where it's dimension is $1 \times p.$ a. Provide the log-likelihood function as a function of the regression parameters. That is, show that
+
+The log-likelihood function for logistic regression is $$
 \begin{aligned}
 \mathcal{L}(p) &= \prod_{i=1}^n f(y_i) \\
 &= \prod_{i=1}^n p^{\,y_i}(1-p)^{\,1-y_i}, \\
 \log\mathcal{L}(p) &= \sum_{i=1}^n \Bigl[ y_i\log(p) + \log(1-p) - y_i\log(1-p) \Bigr] \\
 &= \sum_{i=1}^n \Bigl[ y_i\,\log\!\left(\frac{p}{1-p}\right) + \log(1-p) \Bigr].
 \end{aligned}
-\]
+$$
 
-Recall that $X_i^T \boldsymbol\beta_{p \times 1}$
-so the log-likelihood becomes
+Recall that $X_i^T \boldsymbol\beta_{p \times 1}$ so the log-likelihood becomes
 
-\[
+$$
 \log\mathcal{L}(p) = \sum_{i=1}^n \Bigl[ y_i\,\mathbf{X}_i^T\boldsymbol\beta - \log\!\left(1+\exp\bigl(\mathbf{X}_i^T\boldsymbol\beta\bigr)\right) \Bigr].
-\]
+$$
 
 In matrix notation, we can write the expression as
 
-
-\[
+$$
 \log\mathcal{L}(\beta) = \boldsymbol{y}^T X \boldsymbol\beta - 
 \boldsymbol{1}^T \log(\boldsymbol{1} + \exp(X \boldsymbol\beta))
-\]
+$$
 
-b. Show (derive) the score functions of the log-likelihood with respect to the regression parameters is as follows:
+b.  Show (derive) the score functions of the log-likelihood with respect to the regression parameters is as follows:
 
-\[
+$$
 \nabla_{\boldsymbol\beta} \log\mathcal{L}(p) = \sum_{i=1}^n \left[ y_i\,\mathbf{X}_i - \frac{\exp(\mathbf{X}_i^T\boldsymbol\beta)}{1+\exp(\mathbf{X}_i^T\boldsymbol\beta)}\,\mathbf{X}_i \right].
-\]
+$$
 
 You may also write the expression in matrix notation as follows:
 
-Define $\pi_i = \frac{\exp(\mathbf{X}_i^T\boldsymbol\beta)}{1+\exp(\mathbf{X}_i^T\boldsymbol\beta)}$. Then, 
+Define $\pi_i = \frac{\exp(\mathbf{X}_i^T\boldsymbol\beta)}{1+\exp(\mathbf{X}_i^T\boldsymbol\beta)}$. Then,
 
-\[
+$$
 \nabla_{\boldsymbol\beta} \log\mathcal{L}(p) = X^T(\boldsymbol{y} - \boldsymbol\pi)
-\]
+$$
 
-c. Show (derive) the Hessian function of the log-likelihood with respect to the regression parameters is as follows:
+c.  Show (derive) the Hessian function of the log-likelihood with respect to the regression parameters is as follows:
 
-\[
+$$
 \nabla^2_{\boldsymbol\beta} \log\mathcal{L}(p) = -\sum_{i=1}^n \left[ \frac{1}{1+\exp(\mathbf{X}_i^T\boldsymbol\beta)} \cdot \frac{\exp(\mathbf{X}_i^T\boldsymbol\beta)}{1+\exp(\mathbf{X}_i^T\boldsymbol\beta)}\,\mathbf{X}_i\,\mathbf{X}_i^T \right].
-\]
+$$
 
 You may also write the expression in matrix notation as follows:
 
 Let $W = diag \{ \pi_1(1- \pi_1), \ldots, \pi_n (1- \pi_n) \}.$ It follows that the Hessian can be written as $-X^T W X.$
 
-d. Using the previous steps to write out the Newton-Raphson Algorithm in matrix form. 
+d.  Using the previous steps to write out the Newton-Raphson Algorithm in matrix form.
 
-e. A researcher is interested in how variables, such as GRE (Graduate Record Exam scores), GPA (grade point average) and prestige of the undergraduate institution, effect admission into graduate school. The response variable, admit/don’t admit, is a binary variable, which can be read in using the command below. 
+e.  A researcher is interested in how variables, such as GRE (Graduate Record Exam scores), GPA (grade point average) and prestige of the undergraduate institution, effect admission into graduate school. The response variable, admit/don’t admit, is a binary variable, which can be read in using the command below.
 
-Consider running a logistic regression using the glm() function in R below. Write your own function to implement the Newton Raphson algorithm to output the regression coefficients, and verify that the coefficients match those from the glm() function. 
+Consider running a logistic regression using the glm() function in R below. Write your own function to implement the Newton Raphson algorithm to output the regression coefficients, and verify that the coefficients match those from the glm() function.
 
 ```{r}
 df <- read.csv('https://stats.idre.ucla.edu/stat/data/binary.csv')
@@ -104,14 +122,10 @@ Newton_Raphson_logistic <- function(x, y, b.init, tol=1e-8) {
 }
 ```
 
-
-
-
-
 \newpage
 
-3. Propose a homework exercise that you believe would help reinforce the class content to students in this class. You may not repeat any exercise explicitly that was used in class and this exercise should be done individually. 
+3.  Propose a homework exercise that you believe would help reinforce the class content to students in this class. You may not repeat any exercise explicitly that was used in class and this exercise should be done individually.
 
-Write and propose the question(s), include a rubric, and include a solution. 
+Write and propose the question(s), include a rubric, and include a solution.
 
-You may utilize online resource, but please do cite them if you use them and provide details. 
+You may utilize online resource, but please do cite them if you use them and provide details.
