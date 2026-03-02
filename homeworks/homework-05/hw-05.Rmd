@@ -90,6 +90,33 @@ $$
 \nabla_{\boldsymbol\beta} \log\mathcal{L}(p) = X^T(\boldsymbol{y} - \boldsymbol\pi)
 $$
 
+$$
+\ell(\beta)=\sum_{i=1}^n \left[y_iX_i^T\beta-\log\!\left(1+\exp(X_i^T\beta)\right)\right].
+$$
+
+Let $\eta_i=X_i^T\beta$. Then $$
+\nabla_\beta \ell(\beta)
+=\sum_{i=1}^n \left[y_i\nabla_\beta(\eta_i)-\nabla_\beta\log(1+\exp(\eta_i))\right].
+$$ Since $\nabla_\beta(\eta_i)=\nabla_\beta(X_i^T\beta)=X_i$, and by the chain rule, $$
+\nabla_\beta\log(1+\exp(\eta_i))
+=\frac{1}{1+\exp(\eta_i)}\cdot \exp(\eta_i)\cdot \nabla_\beta(\eta_i)
+=\frac{\exp(\eta_i)}{1+\exp(\eta_i)}\,X_i,
+$$ we obtain $$
+\nabla_\beta \ell(\beta)
+=\sum_{i=1}^n \left[y_iX_i-\frac{\exp(X_i^T\beta)}{1+\exp(X_i^T\beta)}\,X_i\right]
+=\sum_{i=1}^n (y_i-\pi_i)X_i,
+\qquad
+\pi_i:=\frac{\exp(X_i^T\beta)}{1+\exp(X_i^T\beta)}.
+$$
+
+Matrix form Stack $X_i^T$ as rows of $X$, and let $\pi=(\pi_1,\ldots,\pi_n)^T$. Then $$
+\sum_{i=1}^n y_iX_i = X^Ty,
+\qquad
+\sum_{i=1}^n \pi_iX_i = X^T\pi,
+$$ so $$
+\nabla_\beta \ell(\beta)=X^T(y-\pi).
+$$
+
 c.  Show (derive) the Hessian function of the log-likelihood with respect to the regression parameters is as follows:
 
 $$
