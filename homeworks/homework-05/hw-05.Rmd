@@ -127,7 +127,94 @@ You may also write the expression in matrix notation as follows:
 
 Let $W = diag \{ \pi_1(1- \pi_1), \ldots, \pi_n (1- \pi_n) \}.$ It follows that the Hessian can be written as $-X^T W X.$
 
+$$
+\nabla_\beta \ell(\beta)
+= \sum_{i=1}^n (y_i - \pi_i) X_i,
+\qquad
+\pi_i = \frac{\exp(\eta_i)}{1+\exp(\eta_i)},
+\quad
+\eta_i = X_i^T \beta.
+$$
+
+Differentiate again:
+
+$$
+\nabla_\beta^2 \ell(\beta)
+= \sum_{i=1}^n \nabla_\beta\!\big((y_i-\pi_i)X_i\big)
+= -\sum_{i=1}^n (\nabla_\beta \pi_i) X_i^T,
+$$
+
+since $X_i$ does not depend on $\beta$.
+
+Now compute $\nabla_\beta \pi_i$.
+
+Let $\pi_i = g(\eta_i)$ where $$
+g(\eta) = \frac{e^\eta}{1+e^\eta}.
+$$
+
+Then $$
+g'(\eta)
+= \frac{e^\eta(1+e^\eta) - e^\eta e^\eta}{(1+e^\eta)^2}
+= \frac{e^\eta}{(1+e^\eta)^2}
+= \pi_i (1-\pi_i).
+$$
+
+By the chain rule,
+
+$$
+\nabla_\beta \pi_i
+= g'(\eta_i)\,\nabla_\beta \eta_i
+= \pi_i(1-\pi_i) X_i.
+$$
+
+Substitute back:
+
+$$
+\nabla_\beta^2 \ell(\beta)
+= -\sum_{i=1}^n \pi_i(1-\pi_i) X_i X_i^T
+= -\sum_{i=1}^n
+\frac{\exp(X_i^T\beta)}{\big(1+\exp(X_i^T\beta)\big)^2}
+\, X_i X_i^T.
+$$
+
+In matrix form, define
+
+$$
+W = \mathrm{diag}\!\big(\pi_1(1-\pi_1), \ldots, \pi_n(1-\pi_n)\big).
+$$
+
+Since
+
+$$
+X^T W X = \sum_{i=1}^n \pi_i(1-\pi_i) X_i X_i^T,
+$$
+
+we obtain
+
+$$
+\nabla_\beta^2 \ell(\beta) = - X^T W X.
+$$
+
 d.  Using the previous steps to write out the Newton-Raphson Algorithm in matrix form.
+
+    $$
+    \textbf{Newton--Raphson update:}\qquad 
+    \beta^{(t+1)}=\beta^{(t)}-\left[\nabla_\beta^2 \ell\!\left(\beta^{(t)}\right)\right]^{-1}\nabla_\beta \ell\!\left(\beta^{(t)}\right).
+    $$
+
+    Using $$\nabla_\beta \ell(\beta)=X^T(y-\pi), \qquad \nabla_\beta^2\ell(\beta)=-X^T W X,$$ with $$
+    \pi^{(t)}=\frac{\exp(X\beta^{(t)})}{1+\exp(X\beta^{(t)})}\quad(\text{elementwise}), 
+    \qquad 
+    W^{(t)}=\mathrm{diag}\!\Big(\pi^{(t)}_i(1-\pi^{(t)}_i)\Big)_{i=1}^n,
+    $$ we get $$
+    \beta^{(t+1)}
+    =\beta^{(t)}+\left(X^T W^{(t)} X\right)^{-1}X^T\left(y-\pi^{(t)}\right).
+    $$
+
+    Equivalently, $$\beta^{(t+1)}$$ is the solution to the linear system $$
+    \left(X^T W^{(t)} X\right)\beta^{(t+1)}
+    =\left(X^T W^{(t)} X\right)\beta^{(t)}+X^T\left(y-\pi^{(t)}\right).
+    $$
 
 e.  A researcher is interested in how variables, such as GRE (Graduate Record Exam scores), GPA (grade point average) and prestige of the undergraduate institution, effect admission into graduate school. The response variable, admit/don’t admit, is a binary variable, which can be read in using the command below.
 
@@ -140,13 +227,49 @@ summary(mylogit)
 ```
 
 ```{r}
-y<-df[,1]
+y <- df[,1]
 # add column of 1's for the intercept
-x<-as.matrix(cbind(rep(1,400),df[,c(2,3,4)])) 
- 
-Newton_Raphson_logistic <- function(x, y, b.init, tol=1e-8) {
-# use the same type of structure for your code# # as we did for the poisson
+x <- as.matrix(cbind(rep(1, 400), df[, c(2,3,4)]))
+
+Newton_Raphson_logistic <- function(x, y, b.init, tol = 1e-8, max.iter = 100) {
+  b <- as.matrix(b.init)          # ensure column vector
+  iter <- 0
+  diff <- Inf
+  
+  while (diff > tol && iter < max.iter) {
+    # linear predictor
+    eta <- x %*% b
+    
+    # fitted probabilities (logistic)
+    p <- exp(eta) / (1 + exp(eta))
+    
+    # weights
+    w <- as.vector(p * (1 - p))
+    W <- diag(w)
+    
+    # score and Hessian
+    score <- t(x) %*% (y - p)
+    H <- -t(x) %*% W %*% x
+    
+    # Newton-Raphson update: b_new = b - H^{-1} score
+    b.new <- b - solve(H, score)
+    
+    diff <- max(abs(b.new - b))
+    b <- b.new
+    iter <- iter + 1
+  }
+  
+  list(coefficients = as.vector(b),
+       iterations = iter,
+       converged = (iter < max.iter))
 }
+
+# run + verify vs glm
+b.init <- rep(0, ncol(x))
+nr_fit <- Newton_Raphson_logistic(x, y, b.init)
+
+nr_fit$coefficients
+coef(mylogit)
 ```
 
 \newpage
