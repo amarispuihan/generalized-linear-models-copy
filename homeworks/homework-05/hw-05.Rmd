@@ -279,3 +279,298 @@ coef(mylogit)
 Write and propose the question(s), include a rubric, and include a solution.
 
 You may utilize online resource, but please do cite them if you use them and provide details.
+
+## Practice Exercise
+
+The geometric distribution is commonly used to model the number of failures before the first success in repeated Bernoulli trials.
+
+Suppose $$Y_1, \ldots, Y_n$$ are independent observations from a geometric distribution with parameter $$p$$, where $$0 < p < 1$$. The probability mass function is
+
+$$
+f(y|p) = (1-p)^y p, \qquad y = 0,1,2,\ldots
+$$
+
+------------------------------------------------------------------------
+
+### (a)
+
+Rewrite the geometric probability mass function in exponential form. Show that
+
+$$
+f(y|p)
+=
+\exp\left\{
+y\log(1-p) + \log p
+\right\}.
+$$
+
+------------------------------------------------------------------------
+
+### (b)
+
+Show that the geometric distribution belongs to the exponential family.
+
+Write the distribution in the form
+
+$$
+f(y|\eta) = h(y)\exp\{\eta T(y) - A(\eta)\}.
+$$
+
+Identify explicitly
+
+-   the natural parameter $$\eta$$\
+-   the sufficient statistic $$T(y)$$\
+-   the log-partition function $$A(\eta)$$\
+-   the base measure $$h(y)$$
+
+------------------------------------------------------------------------
+
+### (c)
+
+Using your result from part (b), derive the likelihood for $$n$$ independent observations
+
+$$
+L(p) = \prod_{i=1}^{n} f(y_i|p).
+$$
+
+Write the corresponding log-likelihood and identify the sufficient statistic for $$p$$.
+
+------------------------------------------------------------------------
+
+### (d)
+
+Derive the maximum likelihood estimator (MLE) for $$p$$.
+
+------------------------------------------------------------------------
+
+### (e)
+
+Interpret the sufficient statistic from part (c) in plain English. What information about the sample does it summarize?
+
+## Solution
+
+### (a)
+
+Start with the probability mass function
+
+$$
+f(y|p) = (1-p)^y p.
+$$
+
+Rewrite the expression using logarithms:
+
+$$
+(1-p)^y p = \exp\left(y \log(1-p) + \log p\right).
+$$
+
+Thus
+
+$$
+f(y|p) =
+\exp\left\{
+y\log(1-p) + \log p
+\right\}.
+$$
+
+------------------------------------------------------------------------
+
+### (b)
+
+Recall the exponential family form
+
+$$
+f(y|\eta) = h(y)\exp\{\eta T(y) - A(\eta)\}.
+$$
+
+From part (a),
+
+$$
+f(y|p) = \exp\left\{y\log(1-p) + \log p\right\}.
+$$
+
+Let
+
+$$
+\eta = \log(1-p).
+$$
+
+Then
+
+$$
+1-p = e^\eta
+$$
+
+and
+
+$$
+p = 1 - e^\eta.
+$$
+
+Substituting,
+
+$$
+f(y|\eta) =
+\exp\left\{
+\eta y + \log(1-e^\eta)
+\right\}.
+$$
+
+Thus we identify
+
+$$
+T(y) = y
+$$
+
+$$
+\eta = \log(1-p)
+$$
+
+$$
+A(\eta) = -\log(1-e^\eta)
+$$
+
+$$
+h(y) = 1, \qquad y=0,1,2,\ldots
+$$
+
+------------------------------------------------------------------------
+
+### (c)
+
+For independent observations,
+
+$$
+L(p) = \prod_{i=1}^n (1-p)^{y_i} p.
+$$
+
+Simplify:
+
+$$
+L(p) = p^n (1-p)^{\sum_{i=1}^n y_i}.
+$$
+
+The log-likelihood is
+
+$$
+\ell(p) =
+n\log p + \left(\sum_{i=1}^n y_i\right)\log(1-p).
+$$
+
+Thus the sufficient statistic is
+
+$$
+T = \sum_{i=1}^n y_i.
+$$
+
+------------------------------------------------------------------------
+
+### (d)
+
+Differentiate the log-likelihood:
+
+$$
+\frac{d\ell}{dp}
+=
+\frac{n}{p}
+-
+\frac{\sum y_i}{1-p}.
+$$
+
+Set equal to zero:
+
+$$
+\frac{n}{p}
+=
+\frac{\sum y_i}{1-p}.
+$$
+
+Multiply both sides:
+
+$$
+n(1-p) = p\sum y_i.
+$$
+
+Solve for $$p$$:
+
+$$
+n = p\left(n + \sum y_i\right)
+$$
+
+Thus the MLE is
+
+$$
+\hat p =
+\frac{n}{n + \sum_{i=1}^n y_i}.
+$$
+
+------------------------------------------------------------------------
+
+### (e)
+
+The sufficient statistic
+
+$$
+T = \sum_{i=1}^n y_i
+$$
+
+represents the total number of failures observed before success across all trials.
+
+This means that inference about $$p$$ depends only on the **total number of failures**, rather than the individual observations.
+
+## Grading Rubric (4 Points Total)
+
+Each grading element below is worth 0.25 points. Partial credit should be awarded when the relevant step is clearly demonstrated.
+
+------------------------------------------------------------------------
+
+### (a) (0.75 points) Rewriting the geometric pmf in exponential form
+
+• Writes the geometric pmf correctly.\
+• Rewrites powers using logarithms.\
+• Final expression matches
+
+$$
+f(y|p)=\exp\{y\log(1-p)+\log p\}.
+$$
+
+------------------------------------------------------------------------
+
+### (b) (1 point) Identifying exponential family components
+
+• Correctly expresses
+
+$$
+f(y|\eta)=h(y)\exp\{\eta T(y)-A(\eta)\}.
+$$
+
+• Correctly identifies the natural parameter.\
+• Correctly identifies the sufficient statistic.\
+• Correctly identifies the log-partition function and base measure.
+
+------------------------------------------------------------------------
+
+### (c) (1 point) Likelihood and sufficient statistic
+
+• Writes the likelihood for independent observations.\
+• Correctly derives the log-likelihood.\
+• Collects terms involving $$\sum y_i$$.\
+• Identifies the sufficient statistic.
+
+------------------------------------------------------------------------
+
+### (d) (1 point) Maximum likelihood estimator
+
+• Differentiates the log-likelihood correctly.\
+• Sets derivative equal to zero.\
+• Solves algebraically for $$p$$.\
+• Correctly identifies the MLE
+
+$$
+\hat p = \frac{n}{n+\sum y_i}.
+$$
+
+------------------------------------------------------------------------
+
+### (e) (0.25 points) Interpretation
+
+• Provides a correct interpretation of the sufficient statistic.
