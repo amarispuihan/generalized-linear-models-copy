@@ -400,14 +400,55 @@ This suggests that exposure to the nature documentary is associated with increas
 Fit a probit regression model using age, gender, treatment, nep_high and the interaction between nep_high and treatment predict the likelihood of donating. (Note: Your model will be similar (but not exactly the same) as the “Likelihood” model in Table 5 on pg. 11.) Display the model.
 :::
 
+```{r}
+nature$Treatment <- relevel(nature$Treatment, ref = "URBAN (T1)")
+model_probit <- glm(
+  donation_binary ~ Age + Gender + Treatment + nep_high + nep_high:Treatment,
+  data = nature,
+  family = binomial(link = "probit")
+)
+tidy(model_probit) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kable()
+```
+
 ::: callout-note
 ## Part c
 
 Describe the effect of watching the documentary on the likelihood of donating.
 :::
 
+The coefficient on Treatment (Nature T2) is positive, suggesting that watching the documentary increases the likelihood of donating relative to the Urban group. However, this effect is not statistically significant (p = 0.637), indicating that there is no strong evidence that the documentary impacts donation behavior. Additionally, the interaction with environmental attitudes (nep_high) is not significant, suggesting the effect does not differ meaningfully across individuals.
+
+```{r}
+install.packages("margins")  
+library(margins)
+margins(model_probit, variables = "Treatment")
+```
+
+The marginal effect of Treatment (Nature T2) indicates that watching the documentary increases the probability of donating by approximately 2.45 percentage points relative to the Urban group, holding other factors constant. However, this effect is small and, based on earlier results, not statistically significant.
+
 ::: callout-note
 ## Part d
 
 Based on the model, what is the predicted probability of donating for a 20-year old female in the treatment group with a NEP score of 3?
 :::
+
+```{r}
+new_obs <- data.frame(
+  Age = 20,
+  Gender = 0,                 
+  Treatment = "NATURE (T2)",
+  nep_high = 0              
+)
+
+pred_prob <- predict(
+  model_probit,
+  newdata = new_obs,
+  type = "response"
+)
+
+pred_prob
+```
+
+A 20-year-old female in the Nature (T2) group with low NEP has about a 93.0% predicted probability of donating.
