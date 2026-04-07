@@ -175,11 +175,43 @@ Since the p-value is greater than 0.05, we fail to reject the null hypothesis th
 Carefully interpret each of the four model coefficients (including the intercept) in model4 in context.
 :::
 
+The fitted model is
+
+$$
+\log\left(\frac{p}{1-p}\right)
+=
+-2.9989 + 0.0528(\text{yrsmoke}) + 1.1795(\text{bird}) + 0.0093(\text{yrsmoke} \times \text{bird}),
+$$
+
+where $p$ is the probability of lung cancer and $\text{bird} = 1$ indicates birdkeeping.
+
+\textbf{Intercept:}\
+The intercept $-2.9989$ is the log-odds of lung cancer for a non-birdkeeper ($\text{bird} = 0$) who has smoked 0 years. The corresponding odds are $\exp(-2.9989) \approx 0.050$. Thus, a non-birdkeeper with 0 years of smoking has estimated odds of lung cancer of about $0.050$.
+
+\textbf{Years smoked ($\text{yrsmoke}$):}\
+The coefficient $0.0528$ represents the change in log-odds of lung cancer for each additional year of smoking among non-birdkeepers. The corresponding odds ratio is $\exp(0.0528) \approx 1.054$. Thus, for non-birdkeepers, each additional year of smoking multiplies the odds of lung cancer by about $1.054$, or increases the odds by about $5.4\%$, holding birdkeeping status fixed.
+
+\textbf{Birdkeeping ($\text{bird}$):}\
+The coefficient $1.1795$ represents the difference in log-odds of lung cancer between birdkeepers and non-birdkeepers when $\text{yrsmoke} = 0$. The corresponding odds ratio is $\exp(1.1795) \approx 3.253$. Thus, among individuals who have smoked 0 years, birdkeepers have about $3.25$ times the odds of lung cancer compared to non-birdkeepers.
+
+\textbf{Interaction ($\text{yrsmoke} \times \text{bird}$):}\
+The coefficient $0.0093$ indicates how the effect of years smoked differs for birdkeepers relative to non-birdkeepers. The corresponding odds ratio is $\exp(0.0093) \approx 1.009$. Thus, for birdkeepers, each additional year of smoking multiplies the odds of lung cancer by an extra factor of about $1.009$ beyond the effect for non-birdkeepers, corresponding to an additional increase of about $0.9\%$ in the odds per year.
+
+For birdkeepers, the total effect of one additional year of smoking is the sum of the smoking coefficient and the interaction coefficient: $0.0528 + 0.0093 = 0.0621$. The corresponding odds ratio is $\exp(0.0621) \approx 1.064$. Thus, for birdkeepers, each additional year of smoking multiplies the odds of lung cancer by about $1.064$, or increases the odds by about $6.4\%$.
+
 ::: callout-note
 ## Part f
 
 If you replaced yrsmoke everywhere it appears in model4 with a mean-centered version of yrsmoke, tell what would change among these elements: the 4 coefficients, the 4 p-values for coefficients, and the residual deviance.
 :::
+
+Mean-centering $\text{yrsmoke}$ changes the reference point of the model but does not change the underlying fit.
+
+\textbf{Coefficients:} The intercept and the coefficient for $\text{bird}$ change because they are now interpreted at $\text{yrsmoke} = \bar{\text{yrsmoke}}$ rather than at $\text{yrsmoke} = 0$. In contrast, the coefficients for $\text{yrsmoke}$ and the interaction term $\text{yrsmoke}:\text{bird}$ remain the same because centering does not change the slope or the interaction effect.
+
+\textbf{P-values:} The p-values for the intercept and $\text{bird}$ change because their interpretations (and thus their standard errors) depend on the reference point of $\text{yrsmoke}$. The p-values for $\text{yrsmoke}$ and $\text{yrsmoke}:\text{bird}$ remain unchanged since these terms represent slopes, which are unaffected by centering.
+
+\textbf{Residual deviance:} The residual deviance does not change because mean-centering is simply a linear transformation of a predictor and does not affect the fitted probabilities or overall model fit.
 
 ::: callout-note
 ## Part g
@@ -187,11 +219,27 @@ If you replaced yrsmoke everywhere it appears in model4 with a mean-centered ver
 Observe that model3 is a potential final model based on this set of predictor variables. How does the adjusted odds ratio for birdkeeping from model3 compare with the unadjusted odds ratio you found in (b)? Is birdkeeping associated with a significant increase in the odds of developing lung cancer, even after adjusting for other factors?
 :::
 
+```{r}
+summary(model3)
+```
+
+The unadjusted odds ratio for birdkeeping from part (b) is $3.882$. In Model 3, the adjusted odds ratio for birdkeeping is $\exp(1.47555) \approx 4.37$, which is slightly larger than the unadjusted estimate.
+
+This suggests that, after adjusting for years smoked, the association between birdkeeping and lung cancer becomes even stronger. Additionally, the coefficient for birdkeeping in Model 3 is highly statistically significant (p-value $< 0.001$), indicating strong evidence that birdkeeping is associated with an increased odds of developing lung cancer even after accounting for smoking. Thus, birdkeeping appears to have an independent and significant association with lung cancer risk.
+
 ::: callout-note
 ## Part h
 
 Discuss the scope of inference in this study. Can we generalize our findings beyond the subjects in this study? Can we conclude that birdkeeping causes increased odds of developing lung cancer? Do you have other concerns with this study design or the analysis you carried out?
 :::
+
+This study is a case-control study conducted among patients in The Hague, Netherlands, who were registered with general practices and met specific eligibility criteria (e.g., age $\leq 65$ and residency since 1965). Because the sample is not randomly drawn from a broader population, the scope of inference is limited. We can cautiously generalize findings to populations similar to these patients (e.g., similar demographic and geographic contexts), but not to all populations.
+
+Since this is an observational study rather than a randomized experiment, we cannot conclude that birdkeeping causes an increased risk of lung cancer. The results only demonstrate an association. Even though the analysis attempts to adjust for confounders such as age, sex, and smoking history, there may still be residual or unmeasured confounding (e.g., environmental exposures, occupational risks, or socioeconomic differences).
+
+There are also potential sources of bias inherent in the study design. Case-control studies are particularly vulnerable to recall bias, as participants may not accurately report past exposures like smoking or birdkeeping. Selection bias may also arise if controls are not fully representative of the population that produced the cases, despite matching on age and sex. Additionally, measurement error in variables such as years smoked could affect the estimates.
+
+Overall, while the study provides evidence of an association between birdkeeping and lung cancer, the design and potential biases prevent causal conclusions, and the findings should be interpreted with caution.
 
 # Exercise 2
 
