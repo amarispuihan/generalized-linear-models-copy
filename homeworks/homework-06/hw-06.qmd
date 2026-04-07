@@ -249,7 +249,7 @@ The data include daily records for ED arrivals in August 2018 at a public hospit
 
 -   Patients who wait less than 10 minutes
 -   Patients whose waiting time is in the range of 10-60 minutes
--   Patients who wait more than 60 minutes
+-   Patients who wait more than 60 minutes\
 
 ::: callout-note
 ## Part a
@@ -257,17 +257,33 @@ The data include daily records for ED arrivals in August 2018 at a public hospit
 Compare and contrast the proportional odds model with the multinomial logistic regression model. Write your response using 3 - 5 sentences. You can find a brief review of the proportional odds model here: https://library.virginia.edu/data/articles/fitting-and-interpreting-a-proportional-odds-model and https://online.stat.psu.edu/stat504/lesson/8/8.4
 :::
 
+The proportional odds model is designed for ordinal response variables and models cumulative log-odds of the form $\log\left(\frac{P(Y \le k)}{P(Y > k)}\right) = \beta_{0k} - \beta_1 x_1 - \cdots - \beta_p x_p$, where the key feature is that the slope coefficients $\beta_1, \ldots, \beta_p$ are the same across all cutpoints $k$. This implies a common effect of predictors on the odds of being in higher versus lower categories. In contrast, the multinomial logistic regression model is used for nominal outcomes and models category-specific log-odds relative to a baseline, such as $\log\left(\frac{P(Y = k)}{P(Y = 1)}\right)$, with different coefficients $\beta_{1k}, \ldots, \beta_{pk}$ for each category. As a result, the proportional odds model is more parsimonious and interpretable, while the multinomial model is more flexible but requires estimating many more parameters. However, the proportional odds model relies on the assumption that predictor effects are constant across categories, which may not always hold.
+
 ::: callout-note
 ## Part b
 
 Table 5 in the paper contains the output for the wait time and treatment time models. Consider only the model for wait time. Describe the effect of arrival mode (ambulance, walk-in) on the waiting time. Note: walk-in is the baseline in the model. (A link to the paper can be found in the slides).
 :::
 
+The p-value for arrival mode is $< 0.001$, indicating that arrival mode is a statistically significant predictor of waiting time after adjusting for the other variables in the model.
+
+The coefficient for arrival mode (ambulance, with walk-in as the baseline) is $-3.398$. In terms of odds, this corresponds to an odds ratio of $\exp(-3.398) \approx 0.033$.
+
+In the proportional odds model, this means that patients arriving by ambulance have substantially lower odds of being in a higher (longer) waiting time category compared to walk-in patients, holding all other variables constant. Specifically, the odds of being in a longer waiting time category decrease by a factor of approximately $0.033$ for ambulance arrivals.
+
+Thus, arriving by ambulance is associated with a significantly lower likelihood of longer waiting times (i.e., faster care), after adjusting for other factors in the model.
+
 ::: callout-note
 ## Part c
 
 Consider output from both the wait time and treatment time models. Use the results from both models to describe the effect of triage level (red = urgent, green = non-urgent) on the wait and treatment times in the ED. Note: red is the baseline level.
 :::
+
+For the waiting time model, the coefficient for triage level (green vs. red baseline) is $0.016$ with a p-value of $0.153$, indicating that triage level is not a statistically significant predictor of waiting time. The small positive coefficient suggests a slight increase in the odds of being in a longer waiting time category for non-urgent (green) patients compared to urgent (red) patients, but this effect is not statistically meaningful.
+
+For the treatment time model, the coefficient for triage level is $-0.950$ with a p-value $< 0.001$, indicating a statistically significant effect. The corresponding odds ratio is $\exp(-0.950) \approx 0.387$, meaning that non-urgent (green) patients have substantially lower odds of being in a longer treatment time category compared to urgent (red) patients.
+
+Overall, triage level does not significantly affect waiting time, but it has a strong and significant effect on treatment time: urgent (red) patients tend to require longer treatment, while non-urgent (green) patients tend to have shorter treatment durations.
 
 # Exercise 3
 
