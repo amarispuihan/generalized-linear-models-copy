@@ -9,10 +9,14 @@ format:
 ```{r, echo = FALSE, warning = FALSE}
 #| label: load-packages
 
+
+knitr::opts_chunk$set(dev = "cairo_pdf")
+
 library(tidyverse)
 library(broom)
 library(knitr)
 library(scales)
+library(ggplot2)
 
 #Prep
 birdkeeping <- read_csv("birdkeeping.csv")
@@ -301,7 +305,9 @@ See the Introduction and Methods sections of Ibanez and Roussel (2022) for more 
 nature <- read_csv("../data/nature.csv", show_col_types = FALSE)
 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0275806
 nature = nature %>% select(c("donation_binary", "Age", "Gender", "Treatment", "nep_high", "Donation (level)"))
-# summary(nature)
+nature <- nature %>%
+  rename(donation = `Donation (level)`)
+summary(nature)
 ```
 
 ::: callout-note
@@ -309,6 +315,84 @@ nature = nature %>% select(c("donation_binary", "Age", "Gender", "Treatment", "n
 
 Figure 2 on pg. 9 of the article visualizes the relationship between donation amount and treatment. Recreate this visualization using your own code. Use the visualization to describe the relationship between donating and the treatment.
 :::
+
+```{r}
+install.packages("ggpattern")
+library(ggpattern) 
+
+nature <- nature %>%
+  mutate(
+    Treatment = factor(Treatment, levels = c("NATURE (T2)", "URBAN (T1)")),
+    donation = factor(donation, levels = 0:10)
+  )
+
+nature_plot_data <- nature %>%
+  count(Treatment, donation) %>%
+  tidyr::complete(Treatment, donation, fill = list(n = 0)) %>% 
+  group_by(Treatment) %>%
+  mutate(percent = 100 * n / sum(n))
+
+ggplot(
+  nature_plot_data,
+  aes(x = donation, y = percent, fill = Treatment, pattern = Treatment)
+) +
+  geom_col_pattern(
+    position = position_dodge(width = 0.75),
+    width = 0.65,
+    color = "black",
+    pattern_fill = "black",
+    pattern_colour = "black",
+    pattern_density = 0.15,
+    pattern_spacing = 0.04
+  ) +
+  scale_fill_manual(
+    values = c("black", "white"),
+    labels = c("Nature (T2)", "Urban (T1)")
+  ) +
+  scale_pattern_manual(
+    values = c("none", "circle"),
+    labels = c("Nature (T2)", "Urban (T1)")
+  ) +
+  scale_y_continuous(
+    limits = c(0, 30),
+    breaks = seq(0, 30, 5),
+    expand = c(0, 0)
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  labs(
+  x = "Donation to ENGO (€)",
+  y = "percentage",
+  fill = NULL,
+  pattern = NULL
+) +
+  guides(
+    pattern = "none",
+    fill = guide_legend(
+      override.aes = list(
+        pattern = c("none", "circle"),
+        fill = c("black", "white"),
+        colour = "black"
+      )
+    )
+  ) +
+  theme_classic() +
+  theme(
+    axis.title.x = element_text(face = "bold", size = 12),
+    axis.title.y = element_text(face = "bold", size = 12),
+    panel.border = element_rect(color = "grey80", fill = NA, linewidth = 0.8),
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.8),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = c(0.76, 0.70),
+    legend.justification = c(0, 1),
+    legend.background = element_rect(fill = "white", color = NA)
+  )
+
+```
+
+From the visualization, there is a clear difference in donation behavior between the two treatment groups. Participants in the Nature (T2) group tend to donate higher amounts overall, with a larger proportion of observations in the mid-to-high donation levels (e.g., €3–€5 and above). In contrast, participants in the Urban (T1) group are more concentrated at lower donation amounts, including €0, €1, and €2.
+
+This suggests that exposure to the nature documentary is associated with increased pro-environmental behavior, as participants are both more likely to donate and to donate larger amounts. Overall, the distribution for the Nature group is shifted toward higher donation values compared to the Urban group.
 
 ::: callout-note
 ## Part b
